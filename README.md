@@ -1,7 +1,11 @@
 # CAPSTONE_703D
 
-Sistema Unidad Territorial
+Sistema Unidad Territorial - Grupo 3
 
+Proyecto CAPSTONE 003D
+
+
+Profesor Evaluador: DANIEL ALONSO MONTERO VALENZUELA
 
 
 Integrantes: 
