@@ -1,0 +1,10 @@
+# Entorno y configuración
+.env
+
+# Python bytecode
+__pycache__/
+*.pyc
+
+# Archivos temporales y logs
+*.log
+*.tmp
