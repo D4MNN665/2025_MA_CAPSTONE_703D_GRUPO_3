@@ -87,7 +87,7 @@ const JuntaVecinosPage = () => {
                 </Nav.Link>
                 <Nav.Link
                   className="nav-link-hover"
-                  href="#reservas"
+                  href="/reservas"
                   style={!isLoggedIn ? disabledStyle : {}}
                   disabled={!isLoggedIn}
                 >

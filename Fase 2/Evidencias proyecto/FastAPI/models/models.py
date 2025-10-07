@@ -7,7 +7,7 @@ from datetime import datetime
 # TABLA VECINOS
 # --------------------
 class Vecino(BaseModel):
-    id_vecino: Optional[int] = None
+    id_vecino: int
     nombre: str
     apellido: str
     rut: str
@@ -22,7 +22,7 @@ class Vecino(BaseModel):
 # TABLA USUARIOS
 # --------------------
 class Usuario(BaseModel):
-    id_usuario: Optional[int] = None
+    id_usuario: int
     id_vecino: int
     nombre: str
     password_hash: str
@@ -34,7 +34,7 @@ class Usuario(BaseModel):
 # TABLA ACTIVIDADES
 # --------------------
 class Actividad(BaseModel):
-    id_actividad: Optional[int] = None
+    id_actividad: int
     titulo: str
     descripcion: Optional[str] = None
     fecha_inicio: datetime
@@ -59,19 +59,23 @@ class CertificadoResidencia(BaseModel):
 # TABLA RESERVAS
 # --------------------
 class Reserva(BaseModel):
-    id_reserva: Optional[int] = None
+    id_reserva: int
     id_vecino: int
-    espacio: str
+    nombreSector: str
     fecha_inicio: datetime
-    fecha_fin: datetime
     estado: Literal["pendiente", "aprobado", "rechazado"] = "pendiente"
 
+class ReservaCreate(BaseModel):
+    id_vecino: int
+    nombreSector: str
+    fecha_inicio: datetime
+    estado: Literal["pendiente", "aprobado", "rechazado"] = "pendiente"
 
 # --------------------
 # TABLA PROYECTOS
 # --------------------
 class Proyecto(BaseModel):
-    id_proyecto: Optional[int] = None
+    id_proyecto: int
     id_vecino: int
     titulo: str
     descripcion: str
@@ -85,19 +89,19 @@ class Proyecto(BaseModel):
 # TABLA NOTIFICACIONES
 # --------------------
 class Notificacion(BaseModel):
-    id_notificacion: Optional[int] = None
+    id_notificacion: int
     titulo: str
     mensaje: str
     tipo: Literal["afiche", "email", "whatsapp"]
     fecha_envio: datetime = datetime.now()
-    destinatario_id: Optional[int] = None
+    destinatario_id: int
 
 
 # --------------------
 # TABLA NOTICIAS
 # --------------------
 class Noticia(BaseModel):
-    id_noticia: Optional[int] = None
+    id_noticia: int
     titulo: str
     contenido: str
     fecha_publicacion: datetime = datetime.now()
@@ -108,7 +112,7 @@ class Noticia(BaseModel):
 # TABLA INSCRIPCIONES
 # --------------------
 class Inscripcion(BaseModel):
-    id_inscripcion: Optional[int] = None
+    id_inscripcion: int
     id_actividad: int
     id_vecino: int
     fecha_inscripcion: datetime = datetime.now()
