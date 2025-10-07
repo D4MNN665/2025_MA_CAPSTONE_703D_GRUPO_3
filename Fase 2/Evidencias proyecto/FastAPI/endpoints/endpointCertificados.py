@@ -128,7 +128,7 @@ def generar_y_enviar_pdf(certificado, correo_destino):
     pdf.set_font("Arial", "B", 12)
     pdf.cell(50, 8, "Nombre:", 0, 0)
     pdf.set_font("Arial", "", 12)
-    pdf.cell(0, 8, certificado['nombreVecino'], ln=True)
+    pdf.cell(0, 8, certificado['nombreVecino'].upper(), ln=True)
 
     pdf.set_font("Arial", "B", 12)
     pdf.cell(50, 8, "RUT:", 0, 0)
@@ -138,17 +138,17 @@ def generar_y_enviar_pdf(certificado, correo_destino):
     pdf.set_font("Arial", "B", 12)
     pdf.cell(50, 8, "Domicilio:", 0, 0)
     pdf.set_font("Arial", "", 12)
-    pdf.cell(0, 8, certificado['domicilio'], ln=True)
+    pdf.cell(0, 8, certificado['domicilio'].upper(), ln=True)
 
     pdf.set_font("Arial", "B", 12)
     pdf.cell(50, 8, "Tipo de residencia:", 0, 0)
     pdf.set_font("Arial", "", 12)
-    pdf.cell(0, 8, certificado['tipo_residencia'], ln=True)
+    pdf.cell(0, 8, certificado['tipo_residencia'].upper(), ln=True)
 
     pdf.set_font("Arial", "B", 12)
     pdf.cell(50, 8, "Nacionalidad:", 0, 0)
     pdf.set_font("Arial", "", 12)
-    pdf.cell(0, 8, certificado['nacionalidad'], ln=True)
+    pdf.cell(0, 8, certificado['nacionalidad'].upper(), ln=True)
 
     pdf.set_font("Arial", "B", 12)
     pdf.cell(50, 8, "Motivo:", 0, 0)
@@ -174,9 +174,14 @@ def generar_y_enviar_pdf(certificado, correo_destino):
     pdf.cell(0, 8, "_________________________", ln=True, align="R")
     pdf.cell(0, 8, "Firma y Timbre", ln=True, align="R")
 
+    nombre = certificado['nombreVecino']
+    nombre_archivo = re.sub(r'[^\w\s-]', '', nombre).strip().replace(' ', '_')
+    pdf_output = f"certificado_{nombre_archivo}.pdf"
+    pdf.output(pdf_output)
+
     # 2. Enviar el PDF por correo
     remitente = EMAIL_USER
-    password = EMAIL_PASS  # Usa una contraseña de aplicación si usas Gmail
+    password = EMAIL_PASS
     asunto = "Certificado de Residencia"
     cuerpo = "Adjuntamos su certificado de residencia solicitado."
 
@@ -186,19 +191,19 @@ def generar_y_enviar_pdf(certificado, correo_destino):
     msg["To"] = correo_destino
     msg.set_content(cuerpo)
 
-    nombre = certificado['nombreVecino']
-    nombre_archivo = re.sub(r'[^\w\s-]', '', nombre).strip().replace(' ', '_')
-    pdf_output = f"certificado_{nombre_archivo}.pdf"
-    pdf.output(pdf_output)
+    try:
+        with open(pdf_output, "rb") as f:
+            file_data = f.read()
+            file_name = pdf_output
+        msg.add_attachment(file_data, maintype="application", subtype="pdf", filename=file_name)
 
-    with open(pdf_output, "rb") as f:
-        file_data = f.read()
-        file_name = pdf_output
-    msg.add_attachment(file_data, maintype="application", subtype="pdf", filename=file_name)
-
-    # Configura el servidor SMTP (este ejemplo es para Gmail)
-    with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
-        smtp.login(remitente, password)
-        smtp.send_message(msg)
-
-    os.remove(pdf_output)
+        print(f"Enviando correo a {correo_destino} desde {remitente}...")
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(remitente, password)
+            smtp.send_message(msg)
+        print("Correo enviado exitosamente.")
+    except Exception as e:
+        print(f"Error al enviar correo: {e}")
+    finally:
+        if os.path.exists(pdf_output):
+            os.remove(pdf_output)

@@ -1,123 +1,119 @@
-.App {
-  text-align: center;
+/* ===== Navbar ===== */
+.inicio-navbar,
+.inicio-navbar.shadow-sm {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.inicio-navbar .navbar-collapse { border-top: 0 !important; }
+
+.header-color { 
+  background-color: #9d4edd !important; /* Violeta */
+  color: #FFFFFF;
+  padding: 40px 0;
+  border-bottom: 0 !important;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+/* Links base */
+.inicio-navbar .nav-link {
+  color: #fff !important;
+  background: transparent;
+  border-radius: 6px;
+  padding: 8px 12px;
+  transition: all .2s ease;
+  outline: none;
+}
+.inicio-navbar .nav-link:focus-visible,
+.btn:focus-visible, .btn-primary:focus-visible {
+  box-shadow: 0 0 0 3px rgba(157,78,221,.35) !important;
+  border-radius: 8px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.inicio-navbar .nav-link{
-  background-color: #7219d2 !important;
-  color: white !important;
-}
-
-.header-color {
-  background-color: #7219d2 !important;
-}
-
-.paginaprincipal {
-  background-color: #ff6a0085;
-  min-height: 100vh; /* Ocupa toda la altura de la ventana */
-  display: flex;
-  flex-direction: column;
-}
-.footer{
-  background-color: #7219d2 !important;
-  color: white !important;
-
-}
-.main-content {
-  flex: 1; /* El contenido principal ocupa el espacio disponible */
-}
-
+/* Hover */
 .nav-link-hover:hover {
-  color: #0d6efd !important;
+  background-color: #7b2cbf !important; /* Hover violeta más oscuro */
+  color: #fff !important;
   transform: translateY(-2px);
-  transition: all 0.3s ease;
+}
+
+/* ===== Página principal ===== */
+.paginaprincipal {
+  background-color: #F7F7FB;
+  color: #1E293B;
+  min-height: 100vh;  /* para toda la ventana */
+  display: flex;
+  flex-direction: column;
 }
 
 .main-content {
-  min-height: calc(100vh - 200px);
+  flex: 1 0;  /* hace crecer el main y empuja el footer hacia abajo */
+  padding: 40px 20px;  
+  min-height: auto;           
 }
 
-.carousel {
-  max-width: 800px;
-  margin: 0 auto;
-}
-
-.carousel-item img {
-  height: 400px;
-  object-fit: cover;
-}
-
+/* ===== Footer ===== */
 .footer {
-  border-top: 1px solid #dee2e6;
+  background-color: #1e293b !important;
+  color: #F1F5F9 !important;
+  padding: 20px 0;
+  text-align: center;
+  border-top: 0 !important;
+  margin-top: auto; 
 }
+.footer a { color: #9d4edd; }
+.footer a:hover { color: #7b2cbf; }
 
-.btn {
-  transition: all 0.3s ease;
+/* ===== Botones ===== */
+.btn, .btn-primary {
+  background-color: #9d4edd !important;
+  border-color: #9d4edd !important;
+  color: #fff !important;
 }
-
-.btn:hover {
+.btn:hover, .btn-primary:hover {
+  background-color: #7b2cbf !important;
+  border-color: #7b2cbf !important;
   transform: translateY(-2px);
-  box-shadow: 0 2px 5px rgba(255, 0, 0, 0.1);
+  box-shadow: 0 2px 5px rgba(157,78,221,.3);
+}
+.btn:disabled, .btn-primary:disabled {
+  opacity: .6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
-.footer {
-  background-color: #f8f9fa;
-  color: #212529;
-}
-
-.contacto {
-  color: #212529;
-}
-
-.contacto i {
-  color: #0d6efd;
-  margin-right: 8px;
-}
-
-.contacto p {
-  font-size: 1.1rem;
-}
+/* ===== Contacto ===== */
+.contacto { color: #475569; }
+.contacto i { color: #9d4edd; margin-right: 8px; }
 
 
-/* App.css */
-.modal-backdrop {
-  z-index: 1050 !important;
+/* Fondo morado para la página de registro */
+.registro-container {
+background: RGBA(117, 60, 163, 1);
+background: radial-gradient(circle,rgba(117, 60, 163, 1) 0%, rgba(24, 15, 38, 1) 100%);
+ /* el mismo violeta que tu nav */
+  min-height: 100vh; /* que cubra toda la pantalla */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 15px;
 }
-.modal {
-  z-index: 2000 !important;
-  display: block !important;
+
+/* Tarjeta blanca del formulario */
+.registro-card {
+  background: #f8f7f7;
+  color: #28313f;
+  padding: 30px;
+  border-radius: 12px;
+  max-width: 800px;
+  width: 100%;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+}
+
+
+/* Diseño modal */
+
+.modal-body img {
+  max-height: 260px;
+  object-fit: contain;
 }

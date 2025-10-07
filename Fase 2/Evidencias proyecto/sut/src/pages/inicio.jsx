@@ -1,23 +1,22 @@
+// src/pages/inicio.jsx  (o el nombre que uses para la página principal)
 import React, { useState, useEffect } from "react";
 import "../App.css";
+import { useNavigate, Link } from "react-router-dom";
 import { Navbar, Nav, Container, Carousel, NavDropdown } from "react-bootstrap";
-import RegistroVecino from "../components/registroVecino";
 import LoginVecino from "../components/login";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import axios from "axios";
 import { useAuth } from "../context/auth";
 import InscripcionVecinos from "./inscripcion-vecinos";
-import CertificadoResidencia from "./certificados-vecinos";
 
 const JuntaVecinosPage = () => {
-  const [showRegistro, setShowRegistro] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [noticias, setNoticias] = useState([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showInscripcion, setShowInscripcion] = useState(false);
-  const [showCertificado, setshowCertificado] = useState(false);
 
-  const { user, login, logout } = useAuth();
-  const isLoggedIn = !!user;
+  const navigate = useNavigate();
+  const { user,login } = useAuth();
 
   useEffect(() => {
     axios
@@ -26,10 +25,12 @@ const JuntaVecinosPage = () => {
       .catch((err) => console.error(err));
   }, []);
 
-  // Estilo para deshabilitar enlaces
+  useEffect(() => {
+    setIsLoggedIn(!!user);
+  }, [user]);
+
   const disabledStyle = { pointerEvents: "none", opacity: 0.5 };
 
-  // Solo permite abrir el modal si el usuario está logueado y tiene id_usuario
   const handleOpenInscripcion = () => {
     if (user && user.id_usuario) {
       setShowInscripcion(true);
@@ -43,13 +44,9 @@ const JuntaVecinosPage = () => {
       <header className="header-color">
         <Navbar className="inicio-navbar shadow-sm" expand="lg">
           <Container fluid>
-            <Navbar.Brand href="/" className="fw-bold">
-              Junta de Vecinos - Unidad Territorial
-            </Navbar.Brand>
-
             <Navbar.Toggle aria-controls="navbar-nav" />
             <Navbar.Collapse id="navbar-nav">
-              <Nav className="ms-5 d-flex align-items-center gap-3 flex-grow-1">
+              <Nav className="mx-auto d-flex align-items-center gap-3">
                 <Nav.Link
                   className="nav-link-hover"
                   href="#inscripcion"
@@ -62,10 +59,10 @@ const JuntaVecinosPage = () => {
                 </Nav.Link>
                 <NavDropdown
                   title={
-                    <>
+                    <span className="d-flex align-items-center">
                       <i className="bi bi-file-earmark-text me-2"></i>
                       Certificados
-                    </>
+                    </span>
                   }
                   id="nav-certificados-dropdown"
                   className="nav-link-hover"
@@ -73,11 +70,8 @@ const JuntaVecinosPage = () => {
                   disabled={!isLoggedIn}
                 >
                   <NavDropdown.Item
-                    href="#certificado-residencia"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setshowCertificado(true);
-                    }}
+                    as={Link}
+                    to="/certificados"
                   >
                     Certificado de Residencia
                   </NavDropdown.Item>
@@ -119,13 +113,12 @@ const JuntaVecinosPage = () => {
                   Contacto
                 </Nav.Link>
               </Nav>
-              {/* Botones SIEMPRE dentro de Navbar.Collapse pero FUERA de Nav */}
               {!isLoggedIn && (
                 <div className="d-flex align-items-center gap-2 ms-lg-3 mt-3 mt-lg-0">
                   <button
                     type="button"
                     className="btn btn-primary rounded-pill px-4"
-                    onClick={() => setShowRegistro(true)}
+                    onClick={() => navigate("/registro")}
                   >
                     <i className="bi bi-person-plus me-2"></i>
                     Registro
@@ -145,7 +138,10 @@ const JuntaVecinosPage = () => {
                   <button
                     type="button"
                     className="btn btn-danger rounded-pill px-4"
-                    onClick={logout}
+                    onClick={() => {
+                      localStorage.removeItem("user");
+                      setIsLoggedIn(false);
+                    }}
                   >
                     <i className="bi bi-box-arrow-right me-2"></i>
                     Cerrar sesión
@@ -156,34 +152,6 @@ const JuntaVecinosPage = () => {
           </Container>
         </Navbar>
       </header>
-
-      {/* Modals fuera del Navbar para que siempre se monten correctamente */}
-      <RegistroVecino
-        show={showRegistro}
-        handleClose={() => setShowRegistro(false)}
-      />
-      <LoginVecino
-        show={showLogin}
-        handleClose={() => setShowLogin(false)}
-        onLogin={(userData) => {
-          login(userData);
-        }}
-      />
-
-      <InscripcionVecinos
-        show={showInscripcion}
-        handleClose={() => setShowInscripcion(false)}
-        userId={user?.id_usuario}
-        userRol={user?.rol}
-      />
-
-      <CertificadoResidencia
-        show={showCertificado}
-        handleClose={() => setshowCertificado(false)}
-        rut={user?.rut}
-        id_vecino={user?.id_vecino}
-      />
-
       <main className="main-content py-5">
         <Container>
           <div className="text-center mb-5">
@@ -196,7 +164,6 @@ const JuntaVecinosPage = () => {
               línea.
             </p>
           </div>
-
           <div id="noticias" className="noticias mt-5">
             <h3 className="text-center mb-4">Noticias de último momento</h3>
             <Carousel className="shadow rounded">
@@ -230,8 +197,7 @@ const JuntaVecinosPage = () => {
           </div>
         </Container>
       </main>
-
-      <footer className="footer mt-5 py-4 bg-light">
+      <footer className="footer mt-5 py-4">
         <Container>
           <div id="contacto" className="contacto text-center">
             <h3 className="mb-3">Datos de Contacto</h3>
@@ -249,6 +215,22 @@ const JuntaVecinosPage = () => {
           </p>
         </Container>
       </footer>
+      {/* Modales */}
+      <LoginVecino
+        show={showLogin}
+        handleClose={() => setShowLogin(false)}
+        onLogin={(userData) => {
+          setIsLoggedIn(true);
+          login(userData);
+          console.log ("Usuario logueado:", userData);
+        }}
+      />
+      <InscripcionVecinos
+        show={showInscripcion}
+        handleClose={() => setShowInscripcion(false)}
+        userId={user?.id_usuario}
+        userRol={user?.rol}
+      />
     </div>
   );
 };

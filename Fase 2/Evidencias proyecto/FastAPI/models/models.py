@@ -7,21 +7,22 @@ from datetime import datetime
 # TABLA VECINOS
 # --------------------
 class Vecino(BaseModel):
-    id_vecino: int
+    id_vecino: Optional[int] = None
     nombre: str
     apellido: str
     rut: str
     correo: str
-    numero_telefono: str
-    direccion: str
-    miembro: bool = False  # tinyint a bool 
-    contrasena: str
+    numero_telefono: Optional[str] = None
+    direccion: Optional[str] = None
+    miembro: bool = False  # tinyint → bool
+    contrasena: Optional[str] = None
+
 
 # --------------------
 # TABLA USUARIOS
 # --------------------
 class Usuario(BaseModel):
-    id_usuario: int
+    id_usuario: Optional[int] = None
     id_vecino: int
     nombre: str
     password_hash: str
@@ -33,13 +34,13 @@ class Usuario(BaseModel):
 # TABLA ACTIVIDADES
 # --------------------
 class Actividad(BaseModel):
-    id_actividad: int
+    id_actividad: Optional[int] = None
     titulo: str
-    descripcion: str
+    descripcion: Optional[str] = None
     fecha_inicio: datetime
     fecha_fin: datetime
     cupo_max: int
-    cupo_actual: int
+    cupo_actual: int = 0
 
 
 # --------------------
@@ -53,11 +54,12 @@ class CertificadoResidencia(BaseModel):
     tipo_residencia: str
     motivo: str
     id_vecino: int
+    
 # --------------------
 # TABLA RESERVAS
 # --------------------
 class Reserva(BaseModel):
-    id_reserva: int
+    id_reserva: Optional[int] = None
     id_vecino: int
     espacio: str
     fecha_inicio: datetime
@@ -69,7 +71,7 @@ class Reserva(BaseModel):
 # TABLA PROYECTOS
 # --------------------
 class Proyecto(BaseModel):
-    id_proyecto: int
+    id_proyecto: Optional[int] = None
     id_vecino: int
     titulo: str
     descripcion: str
@@ -83,7 +85,7 @@ class Proyecto(BaseModel):
 # TABLA NOTIFICACIONES
 # --------------------
 class Notificacion(BaseModel):
-    id_notificacion: int
+    id_notificacion: Optional[int] = None
     titulo: str
     mensaje: str
     tipo: Literal["afiche", "email", "whatsapp"]
@@ -95,7 +97,7 @@ class Notificacion(BaseModel):
 # TABLA NOTICIAS
 # --------------------
 class Noticia(BaseModel):
-    id_noticia: int
+    id_noticia: Optional[int] = None
     titulo: str
     contenido: str
     fecha_publicacion: datetime = datetime.now()
@@ -106,10 +108,7 @@ class Noticia(BaseModel):
 # TABLA INSCRIPCIONES
 # --------------------
 class Inscripcion(BaseModel):
-    id_inscripcion: int
+    id_inscripcion: Optional[int] = None
     id_actividad: int
     id_vecino: int
     fecha_inscripcion: datetime = datetime.now()
-
-
-

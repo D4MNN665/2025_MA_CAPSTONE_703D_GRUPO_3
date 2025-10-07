@@ -1,8 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Registro from "./pages/registro";
 import Dashboard from "./components/dashboard_supervisor/dashboard";
 import PrivateRoute from "./context/PrivateRoute";
 import JuntaVecinosPage from "./pages/inicio.jsx";
+import CertificadosVecinosPage from "./pages/certificados-vecinos-page.jsx";
 
 function App() {
   return (
@@ -18,6 +20,8 @@ function App() {
               </PrivateRoute>
             }
           />
+          <Route path="/registro" element={<Registro />} />
+          <Route path="/certificados" element={<CertificadosVecinosPage />} /> {/* Usa la página puente */}
         </Routes>
       </div>
     </Router>

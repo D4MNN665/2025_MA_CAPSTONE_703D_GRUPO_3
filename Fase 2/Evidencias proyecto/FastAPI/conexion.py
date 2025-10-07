@@ -1,17 +1,19 @@
 import mysql.connector
-from mysql.connector import errorcode
-
+from mysql.connector import Error
 
 def conectar_db():
     try:
         cnx = mysql.connector.connect(
-            user='root',
-            password='1234',
-            host='localhost',
-            database='bd_sut'
+            host="127.0.0.1",
+            port=3306,
+            user="root",
+            password="1234",
+            database="bd_sut",
+            autocommit=False,
+            connection_timeout=5
         )
-        print("cnx lista")
-        return cnx
-    except mysql.connector.Error as err:
-        print(f"Error al conectar a la base de datos: {err}")
-        return None
+        if cnx.is_connected():
+            return cnx
+    except Error as err:
+        print(f"[DB] Error al conectar: {err}")
+    return None
