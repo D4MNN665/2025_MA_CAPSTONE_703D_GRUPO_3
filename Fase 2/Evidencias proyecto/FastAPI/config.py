@@ -31,3 +31,6 @@ def configurar_cors(app):
         allow_methods=["*"],
         allow_headers=["*"],
     )
+
+
+configurar_cors(app)

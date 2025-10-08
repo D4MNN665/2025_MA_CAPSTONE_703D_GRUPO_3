@@ -57,39 +57,48 @@ const ReservaEspaciosPage = () => {
   
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setMensaje("");
-    setError("");
+  e.preventDefault();
+  setMensaje("");
+  setError("");
 
-    const reserva = {
+  const reserva = {
     id_vecino: user.id_vecino, 
     nombreSector: plazaSeleccionada,
     fecha_inicio: new Date(fecha).toISOString(),
     estado: "pendiente" 
-    };
-
-    try {
-      const response = await fetch(URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(reserva),
-      });
-      if (response.ok) {
-        setMensaje("Reserva realizada exitosamente.");
-        setPlazaSeleccionada("");
-        setFecha("");
-      } else {
-        const data = await response.json();
-        if (Array.isArray(data.detail)) {
-          setError(data.detail.map((err) => err.msg).join(", "));
-        } else {
-          setError(data.detail || "Error al realizar la reserva.");
-        }
-      }
-    } catch (error) {
-      setError("Error de conexión con el servidor.");
-    }
   };
+
+  try {
+    const response = await fetch(URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(reserva),
+    });
+
+    let data = null;
+    // Solo intenta leer JSON si hay contenido
+    const text = await response.text();
+    if (text) {
+      data = JSON.parse(text);
+    }
+
+    if (response.ok) {
+      setMensaje("Reserva realizada exitosamente.");
+      setPlazaSeleccionada("");
+      setFecha("");
+    } else {
+      if (data && Array.isArray(data.detail)) {
+        setError(data.detail.map((err) => err.msg).join(", "));
+      } else if (data && data.detail) {
+        setError(data.detail || "Error al realizar la reserva.");
+      } else {
+        setError("Error al realizar la reserva.");
+      }
+    }
+  } catch (error) {
+    setError("Error de conexión con el servidor.");
+  }
+};
 
   return (
     <div className="container fluid">

@@ -30,11 +30,12 @@ CREATE TABLE `proyectos` (
   `fecha_postulacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `estado` enum('pendiente','aprobado','rechazado') NOT NULL DEFAULT 'pendiente',
   `fecha_resolucion` datetime DEFAULT NULL,
-  `resolucion_email` text,
+  `tipo_proyecto` varchar(45) DEFAULT NULL,
+  `ubicacion` varchar(45) DEFAULT NULL,
   PRIMARY KEY (`id_proyecto`),
   KEY `fk_proyecto_vecino_idx` (`id_vecino`),
   CONSTRAINT `fk_proyecto_vecino` FOREIGN KEY (`id_vecino`) REFERENCES `vecinos` (`id_vecino`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,6 +44,7 @@ CREATE TABLE `proyectos` (
 
 LOCK TABLES `proyectos` WRITE;
 /*!40000 ALTER TABLE `proyectos` DISABLE KEYS */;
+INSERT INTO `proyectos` VALUES (6,18,'sdaasd','asdasd','2025-10-08 00:00:00','pendiente',NULL,'Infraestructura','adsdsa');
 /*!40000 ALTER TABLE `proyectos` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -55,4 +57,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-08  1:37:54
+-- Dump completed on 2025-10-08 14:03:01

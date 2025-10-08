@@ -16,7 +16,7 @@ const JuntaVecinosPage = () => {
   const [showInscripcion, setShowInscripcion] = useState(false);
 
   const navigate = useNavigate();
-  const { user,login } = useAuth();
+  const { user, login } = useAuth();
 
   useEffect(() => {
     axios
@@ -69,16 +69,14 @@ const JuntaVecinosPage = () => {
                   style={!isLoggedIn ? disabledStyle : {}}
                   disabled={!isLoggedIn}
                 >
-                  <NavDropdown.Item
-                    as={Link}
-                    to="/certificados"
-                  >
+                  <NavDropdown.Item as={Link} to="/certificados">
                     Certificado de Residencia
                   </NavDropdown.Item>
                 </NavDropdown>
                 <Nav.Link
                   className="nav-link-hover"
-                  href="#proyectos"
+                  as={Link}
+                  to="/proyectos"
                   style={!isLoggedIn ? disabledStyle : {}}
                   disabled={!isLoggedIn}
                 >
@@ -222,7 +220,7 @@ const JuntaVecinosPage = () => {
         onLogin={(userData) => {
           setIsLoggedIn(true);
           login(userData);
-          console.log ("Usuario logueado:", userData);
+          console.log("Usuario logueado:", userData);
         }}
       />
       <InscripcionVecinos

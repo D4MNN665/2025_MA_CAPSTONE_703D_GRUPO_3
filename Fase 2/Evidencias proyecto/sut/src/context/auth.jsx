@@ -2,27 +2,36 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
+export function useAuth() {
+  return useContext(AuthContext);
+}
+
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
-
-  // Recupera el usuario del localStorage al cargar la app
-  useEffect(() => {
+  // Inicializa el usuario desde localStorage si existe
+  const [user, setUser] = useState(() => {
     const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
-    }
-  }, []);
+    return storedUser ? JSON.parse(storedUser) : null;
+  });
 
-  // Guarda el usuario en localStorage al hacer login
+  // Guarda el usuario en localStorage cuando cambia
+  useEffect(() => {
+    if (user) {
+      localStorage.setItem("user", JSON.stringify(user));
+    } else {
+      localStorage.removeItem("user");
+    }
+  }, [user]);
+
+  // Ejemplo de función de login
   const login = (userData) => {
     setUser(userData);
-    localStorage.setItem("user", JSON.stringify(userData));
+    // localStorage se actualiza automáticamente por el useEffect
   };
 
-  // Borra el usuario del localStorage al hacer logout
+  // Ejemplo de función de logout
   const logout = () => {
     setUser(null);
-    localStorage.removeItem("user");
+    // localStorage se limpia automáticamente por el useEffect
   };
 
   return (
@@ -30,8 +39,4 @@ export function AuthProvider({ children }) {
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
 }

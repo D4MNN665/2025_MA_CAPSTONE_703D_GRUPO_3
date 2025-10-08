@@ -72,7 +72,7 @@ class Reserva(BaseModel): # models para consultar reservas ( con id_reserva)
     nombreSector: str
     fecha_inicio: str
     estado: Literal["pendiente", "aprobado", "rechazado"] = "pendiente"
-    nombre_completo: str
+    nombre_completo: Optional[str] = None
 
 # --------------------
 # TABLA PROYECTOS
@@ -82,10 +82,20 @@ class Proyecto(BaseModel):
     id_vecino: int
     titulo: str
     descripcion: str
-    fecha_postulacion: datetime = datetime.now()
+    fecha_postulacion: str
     estado: Literal["pendiente", "aprobado", "rechazado"] = "pendiente"
-    fecha_resolucion: Optional[datetime] = None
-    resolucion_email: Optional[str] = None
+    tipo_proyecto: str
+    ubicacion: str
+    fecha_resolucion: Optional[str] = None
+
+class ProyectoCrear(BaseModel):
+    id_vecino: int
+    titulo: str
+    descripcion: str
+    fecha_postulacion: str
+    estado: Literal["pendiente", "aprobado", "rechazado"] = "pendiente"
+    tipo_proyecto: str
+    ubicacion: str
 
 
 # --------------------
