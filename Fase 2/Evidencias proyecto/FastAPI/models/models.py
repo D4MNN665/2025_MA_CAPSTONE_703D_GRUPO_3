@@ -54,22 +54,25 @@ class CertificadoResidencia(BaseModel):
     tipo_residencia: str
     motivo: str
     id_vecino: int
+    razon_rechazo: Optional[str] = None  
+
     
 # --------------------
 # TABLA RESERVAS
 # --------------------
-class Reserva(BaseModel):
-    id_reserva: int
+class ReservaCreate(BaseModel): #  models para crear reservas ( sin id_reserva porque la bd se encarga automaticamente)
     id_vecino: int
     nombreSector: str
-    fecha_inicio: datetime
+    fecha_inicio: str
     estado: Literal["pendiente", "aprobado", "rechazado"] = "pendiente"
 
-class ReservaCreate(BaseModel):
+class Reserva(BaseModel): # models para consultar reservas ( con id_reserva)
     id_vecino: int
+    id_reserva: int
     nombreSector: str
-    fecha_inicio: datetime
+    fecha_inicio: str
     estado: Literal["pendiente", "aprobado", "rechazado"] = "pendiente"
+    nombre_completo: str
 
 # --------------------
 # TABLA PROYECTOS

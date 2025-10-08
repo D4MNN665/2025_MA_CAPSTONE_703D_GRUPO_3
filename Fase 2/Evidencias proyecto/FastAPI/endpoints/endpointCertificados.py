@@ -8,7 +8,6 @@ from email.message import EmailMessage
 import smtplib
 import re
 
-
 router = APIRouter()
 
 from dotenv import load_dotenv
@@ -62,23 +61,59 @@ def listar_certificados():
     conn.close()
     return certificados
 
-
 class EstadoCertificado(BaseModel):
     estado: str
+    razon: str = None  # Para la razón de rechazo
 
 @router.put("/certificados/residencia/{id_certificado}")
-def actualizar_estado_certificado(id_certificado: int, estado_data: EstadoCertificado):
+def actualizar_estado_certificado(id_certificado: int, estado_data: EstadoCertificado, background_tasks: BackgroundTasks):
     conn = conectar_db()
-    cursor = conn.cursor()
-    cursor.execute(
-        "UPDATE certificados SET estado = %s WHERE id_certificado = %s",
-        (estado_data.estado, id_certificado)
-    )
+    cursor = conn.cursor(dictionary=True)
+    # Si es rechazo, actualiza también la razón
+    if estado_data.estado == "rechazado":
+        cursor.execute(
+            "UPDATE certificados SET estado = %s, razon_rechazo = %s WHERE id_certificado = %s",
+            (estado_data.estado, estado_data.razon, id_certificado)
+        )
+    else:
+        cursor.execute(
+            "UPDATE certificados SET estado = %s WHERE id_certificado = %s",
+            (estado_data.estado, id_certificado)
+        )
     conn.commit()
+
+    # Si es rechazo, busca el correo y envía el email
+    if estado_data.estado == "rechazado":
+        cursor.execute("SELECT id_vecino FROM certificados WHERE id_certificado = %s", (id_certificado,))
+        cert = cursor.fetchone()
+        if cert:
+            cursor.execute("SELECT correo FROM vecinos WHERE id_vecino = %s", (cert["id_vecino"],))
+            vecino = cursor.fetchone()
+            if vecino and vecino["correo"]:
+                background_tasks.add_task(enviar_correo_rechazo, vecino["correo"], estado_data.razon)
     cursor.close()
     conn.close()
     return {"mensaje": "Estado actualizado"}
 
+def enviar_correo_rechazo(correo_destino, razon):
+    remitente = EMAIL_USER
+    password = EMAIL_PASS
+    asunto = "Solicitud de Certificado Rechazada"
+    cuerpo = f"Estimado/a,\n\nSu solicitud de certificado ha sido rechazada por la siguiente razón:\n\n{razon}\n\nAtentamente,\nJunta de Vecinos"
+
+    msg = EmailMessage()
+    msg["Subject"] = asunto
+    msg["From"] = remitente
+    msg["To"] = correo_destino
+    msg.set_content(cuerpo)
+
+    try:
+        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as smtp:
+            smtp.login(remitente, password)
+            smtp.send_message(msg)
+        print(f"Correo de rechazo enviado a {correo_destino}")
+    except Exception as e:
+        print(f"Error al enviar correo de rechazo: {e}")
 
 @router.post("/certificados/enviar_pdf/{id_certificado}")
 def enviar_pdf_certificado(id_certificado: int, background_tasks: BackgroundTasks):
@@ -101,7 +136,6 @@ def enviar_pdf_certificado(id_certificado: int, background_tasks: BackgroundTask
 
     background_tasks.add_task(generar_y_enviar_pdf, certificado, vecino["correo"])
     return {"mensaje": "El PDF se está generando y enviando al correo."}
-
 
 def generar_y_enviar_pdf(certificado, correo_destino):
     pdf = FPDF()

@@ -3,6 +3,9 @@ import React, { useEffect, useState } from "react";
 const CertificadosDashboard = () => {
   const [certificados, setCertificados] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [razonRechazo, setRazonRechazo] = useState("");
+  const [certificadoRechazo, setCertificadoRechazo] = useState(null);
 
   useEffect(() => {
     fetch("http://localhost:8000/certificados/residencia")
@@ -15,11 +18,11 @@ const CertificadosDashboard = () => {
   }, []);
 
   // Función para actualizar el estado del certificado
-  const actualizarEstado = (id_certificado, nuevoEstado) => {
+  const actualizarEstado = (id_certificado, nuevoEstado, razon = "") => {
     fetch(`http://localhost:8000/certificados/residencia/${id_certificado}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ estado: nuevoEstado }),
+      body: JSON.stringify({ estado: nuevoEstado, razon }),
     }).then((res) => {
       if (res.ok) {
         setCertificados((prev) =>
@@ -47,6 +50,23 @@ const CertificadosDashboard = () => {
       .catch(() => {
         alert("Error al enviar el PDF");
       });
+  };
+
+  // Nueva función para manejar el rechazo
+  const handleRechazar = (cert) => {
+    setCertificadoRechazo(cert);
+    setShowModal(true);
+  };
+
+  const handleEnviarRechazo = () => {
+    if (razonRechazo.trim() === "") {
+      alert("Por favor ingrese una razón.");
+      return;
+    }
+    actualizarEstado(certificadoRechazo.id_certificado, "rechazado", razonRechazo);
+    setShowModal(false);
+    setRazonRechazo("");
+    setCertificadoRechazo(null);
   };
 
   return (
@@ -93,9 +113,7 @@ const CertificadosDashboard = () => {
                       </button>
                       <button
                         className="btn btn-danger btn-sm"
-                        onClick={() =>
-                          actualizarEstado(cert.id_certificado, "rechazado")
-                        }
+                        onClick={() => handleRechazar(cert)}
                       >
                         Rechazar
                       </button>
@@ -117,6 +135,40 @@ const CertificadosDashboard = () => {
             ))}
           </tbody>
         </table>
+      )}
+
+      {/* Modal para ingresar razón de rechazo */}
+      {showModal && (
+        <div className="modal" style={{
+          display: "block",
+          background: "rgba(0,0,0,0.5)"
+        }}>
+          <div className="modal-dialog">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">Razón del rechazo</h5>
+                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <textarea
+                  className="form-control"
+                  rows="3"
+                  value={razonRechazo}
+                  onChange={(e) => setRazonRechazo(e.target.value)}
+                  placeholder="Ingrese la razón del rechazo"
+                />
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={() => setShowModal(false)}>
+                  Cancelar
+                </button>
+                <button className="btn btn-danger" onClick={handleEnviarRechazo}>
+                  Rechazar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );
