@@ -19,3 +19,9 @@
 - **Sebastián Andrés Palma Espinoza**  
 
 ---
+Informacion addicional:
+
+Front end: React (Ejecutar con Node.js)
+
+Back end: FastAPI + MySQL server (Ejecutar el requirements.txt )
+
