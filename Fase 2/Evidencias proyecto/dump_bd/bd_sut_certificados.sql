@@ -47,7 +47,7 @@ CREATE TABLE `certificados` (
 
 LOCK TABLES `certificados` WRITE;
 /*!40000 ALTER TABLE `certificados` DISABLE KEYS */;
-INSERT INTO `certificados` VALUES (14,'2025-09-29 21:16:11','aprobado',NULL,'Necesito el certificado porque....','Chileno','20.820.262-6','David Correa','Hnos Campos 261 V Arrayan 1','propietario',18,NULL),(17,'2025-10-03 16:21:44','aprobado',NULL,'Motivo X','Chileno','20.722.122-8','David Correa Mardones','Av san martin 1058','propietario',17,NULL),(18,'2025-10-06 11:28:38','rechazado',NULL,'123','Chileno','20.820.262-6','David Correa Mardones','Av san martin 1058','propietario',18,NULL),(19,'2025-10-06 22:04:30','rechazado',NULL,'13232123132','Chileno','20.820.262-6','David Correa Mardones','Av san martin 1058','propietario',18,'fuiste rechazado porque bla bla bla bla');
+INSERT INTO `certificados` VALUES (14,'2025-09-29 21:16:11','pendiente',NULL,'Necesito el certificado porque....','Chileno','20.820.262-6','David Correa','Hnos Campos 261 V Arrayan 1','propietario',18,NULL);
 /*!40000 ALTER TABLE `certificados` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -60,4 +60,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-08 14:03:02
+-- Dump completed on 2025-10-10 14:29:52
