@@ -41,6 +41,8 @@ class Actividad(BaseModel):
     fecha_fin: datetime
     cupo_max: int
     cupo_actual: int = 0
+    razon_rechazo: Optional[str] = None  
+
 
 
 # --------------------
@@ -87,6 +89,8 @@ class Proyecto(BaseModel):
     tipo_proyecto: str
     ubicacion: str
     fecha_resolucion: Optional[str] = None
+    razon_rechazo: Optional[str] = None  
+
 
 class ProyectoCrear(BaseModel):
     id_vecino: int
