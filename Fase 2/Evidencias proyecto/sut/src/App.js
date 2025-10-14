@@ -4,6 +4,7 @@ import Registro from "./pages/registro";
 import Dashboard from "./components/dashboard_supervisor/dashboard";
 import PrivateRoute from "./context/PrivateRoute";
 import JuntaVecinosPage from "./pages/inicio.jsx";
+import LoginPage from "./pages/login.jsx";
 import CertificadosVecinosPage from "./pages/certificados-vecinos-page.jsx";
 import ReservaEspaciosPage from "./pages/reserva_espacios.jsx";
 import ProyectosVecinosForm from "./pages/proyectos_vecinos.jsx";
@@ -14,6 +15,7 @@ function App() {
       <div className="App">
         <Routes>
           <Route path="/" element={<JuntaVecinosPage />} />
+          <Route path="/login" element={<LoginPage />} />
           <Route
             path="/dashboard/*"
             element={

@@ -3,20 +3,20 @@ import React, { useState, useEffect } from "react";
 import "../App.css";
 import { useNavigate, Link } from "react-router-dom";
 import { Navbar, Nav, Container, Carousel, NavDropdown } from "react-bootstrap";
-import LoginVecino from "../components/login";
+// import LoginVecino from "../components/login";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import axios from "axios";
 import { useAuth } from "../context/auth";
 import InscripcionVecinos from "./inscripcion-vecinos";
 
 const JuntaVecinosPage = () => {
-  const [showLogin, setShowLogin] = useState(false);
+  // const [showLogin, setShowLogin] = useState(false);
   const [noticias, setNoticias] = useState([]);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [showInscripcion, setShowInscripcion] = useState(false);
 
   const navigate = useNavigate();
-  const { user, login } = useAuth();
+  const { user } = useAuth();
 
   useEffect(() => {
     axios
@@ -121,14 +121,13 @@ const JuntaVecinosPage = () => {
                     <i className="bi bi-person-plus me-2"></i>
                     Registro
                   </button>
-                  <button
-                    type="button"
+                  <Link
+                    to="/login"
                     className="btn btn-primary rounded-pill px-4"
-                    onClick={() => setShowLogin(true)}
                   >
                     <i className="bi bi-box-arrow-in-right me-2"></i>
                     Login
-                  </button>
+                  </Link>
                 </div>
               )}
               {isLoggedIn && (
@@ -213,16 +212,7 @@ const JuntaVecinosPage = () => {
           </p>
         </Container>
       </footer>
-      {/* Modales */}
-      <LoginVecino
-        show={showLogin}
-        handleClose={() => setShowLogin(false)}
-        onLogin={(userData) => {
-          setIsLoggedIn(true);
-          login(userData);
-          console.log("Usuario logueado:", userData);
-        }}
-      />
+      {/* Modales eliminados: Login ahora es una página */}
       <InscripcionVecinos
         show={showInscripcion}
         handleClose={() => setShowInscripcion(false)}
