@@ -1,1 +1,0 @@
-// Componente eliminado: Login ahora es una página, no un modal.
