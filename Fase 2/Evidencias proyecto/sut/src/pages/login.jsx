@@ -38,11 +38,10 @@ const LoginPage = () => {
         }),
       });
       const data = await response.json().catch(() => ({}));
-      if (response.ok) {
+      if (response.ok && data.rol) {
         if (data.rol === "admin") {
           alert("Bienvenido Administrador");
           login(data);
-          localStorage.setItem("user", JSON.stringify(data));
           navigate("/dashboard");
         } else if (data.rol === "vecino" || data.rol === "directivo") {
           alert(
@@ -51,12 +50,7 @@ const LoginPage = () => {
               : "Bienvenido Directivo"
           );
           login(data);
-          localStorage.setItem("user", JSON.stringify(data));
           navigate("/");
-        } else if (data.rol === "secretario") {
-          alert("Bienvenido Secretario");
-        } else if (data.rol === "tesorero") {
-          alert("Bienvenido Tesorero");
         } else {
           alert("Tipo de usuario desconocido");
         }
