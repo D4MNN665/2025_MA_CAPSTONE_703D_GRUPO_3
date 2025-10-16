@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Form, Button, Spinner } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
-import { validarRut } from "../components/registroVecino"; // Ajusta la ruta si es necesario
 import { useAuth } from "../context/auth";
 
 const LoginPage = () => {
@@ -14,16 +13,26 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-    const { name, value } = e.target;
-    setForm((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
+  const campo = e.target.name;
+  const valor = e.target.value;
+
+  // Creamos una copia del estado actual
+  const nuevoForm = { ...form };
+
+  // Actualizamos el campo correspondiente
+  if (campo === "rut") {
+    nuevoForm.rut = valor;
+  } else if (campo === "contrasena") {
+    nuevoForm.contrasena = valor;
+  }
+
+  // Guardamos el nuevo estado
+  setForm(nuevoForm);
+};
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!validarRut(form.rut)) {
+    if (!form.rut) {
       alert("El RUT ingresado no es válido");
       return;
     }
