@@ -38,7 +38,7 @@ CREATE TABLE `certificados` (
   PRIMARY KEY (`id_certificado`),
   KEY `fk_certificado_vecino` (`id_vecino`),
   CONSTRAINT `fk_certificado_vecino` FOREIGN KEY (`id_vecino`) REFERENCES `vecinos` (`id_vecino`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -47,7 +47,7 @@ CREATE TABLE `certificados` (
 
 LOCK TABLES `certificados` WRITE;
 /*!40000 ALTER TABLE `certificados` DISABLE KEYS */;
-INSERT INTO `certificados` VALUES (14,'2025-09-29 21:16:11','pendiente',NULL,'Necesito el certificado porque....','Chileno','20.820.262-6','David Correa','Hnos Campos 261 V Arrayan 1','propietario',18,NULL);
+INSERT INTO `certificados` VALUES (14,'2025-09-29 21:16:11','pendiente',NULL,'Necesito el certificado porque....','Chileno','20.820.262-6','David Correa','Hnos Campos 261 V Arrayan 1','propietario',18,NULL),(21,'2025-10-14 17:28:27','pendiente',NULL,'asddsadsd','Chileno','20.820.262-6','David Correa Mardones','Av san martin 1058','propietario',18,NULL);
 /*!40000 ALTER TABLE `certificados` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -60,4 +60,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-10 14:29:52
+-- Dump completed on 2025-10-15 21:08:51

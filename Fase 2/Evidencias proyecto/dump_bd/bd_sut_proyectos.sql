@@ -36,7 +36,7 @@ CREATE TABLE `proyectos` (
   PRIMARY KEY (`id_proyecto`),
   KEY `fk_proyecto_vecino_idx` (`id_vecino`),
   CONSTRAINT `fk_proyecto_vecino` FOREIGN KEY (`id_vecino`) REFERENCES `vecinos` (`id_vecino`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -45,7 +45,7 @@ CREATE TABLE `proyectos` (
 
 LOCK TABLES `proyectos` WRITE;
 /*!40000 ALTER TABLE `proyectos` DISABLE KEYS */;
-INSERT INTO `proyectos` VALUES (7,18,'Plantar arboles','Ejemplo 123','2025-10-10 00:00:00','pendiente','2025-10-10 14:04:42','Ambiental','Clotario blest con Eladio rojas',NULL);
+INSERT INTO `proyectos` VALUES (8,18,'Plantar arboles','Ejemplo','2025-10-10 00:00:00','aprobado','2025-10-14 17:29:44','Ambiental','Clotario blest con Eladio rojas',NULL);
 /*!40000 ALTER TABLE `proyectos` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -58,4 +58,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-10 14:29:51
+-- Dump completed on 2025-10-15 21:08:50
