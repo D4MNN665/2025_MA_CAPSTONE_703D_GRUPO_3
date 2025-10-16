@@ -163,7 +163,8 @@ const JuntaVecinosPage = () => {
           </div>
           <div id="noticias" className="noticias mt-5">
             <h3 className="text-center mb-4">Noticias de último momento</h3>
-            <Carousel className="shadow rounded">
+            <Carousel
+              className="shadow rounded">
               {noticias.length === 0 ? (
                 <Carousel.Item>
                   <div
@@ -176,17 +177,30 @@ const JuntaVecinosPage = () => {
               ) : (
                 noticias.map((noticia, idx) => (
                   <Carousel.Item key={noticia.id_noticia || idx}>
-                    {noticia.imagen ? (
-                      <img
-                        className="d-block w-100"
-                        src={noticia.imagen}
-                        alt={`imagen Noticia ${idx + 1}`}
-                      />
-                    ) : null}
-                    <Carousel.Caption>
-                      <h5>{noticia.titulo}</h5>
-                      <p>{noticia.descripcion}</p>
-                    </Carousel.Caption>
+                    <div style={{ minHeight: "200px" }}>
+                      <Carousel.Caption>
+                        <h5
+                          style={{
+                            color: "#222",
+                            background: "rgba(255,255,255,0.85)",
+                            padding: "8px",
+                            borderRadius: "8px",
+                          }}
+                        >
+                          {noticia.titulo}
+                        </h5>
+                        <p
+                          style={{
+                            color: "#222",
+                            background: "rgba(255,255,255,0.85)",
+                            padding: "8px",
+                            borderRadius: "8px"
+                          }}
+                        >
+                          {noticia.contenido}
+                        </p>
+                      </Carousel.Caption>
+                    </div>
                   </Carousel.Item>
                 ))
               )}

@@ -109,7 +109,7 @@ class Notificacion(BaseModel):
     id_notificacion: int
     titulo: str
     mensaje: str
-    tipo: Literal["afiche", "email", "whatsapp"]
+    tipo: Literal["email", "whatsapp"]
     fecha_envio: datetime = datetime.now()
     destinatario_id: int
 
@@ -118,7 +118,7 @@ class Notificacion(BaseModel):
 # TABLA NOTICIAS
 # --------------------
 class Noticia(BaseModel):
-    id_noticia: int
+    id_noticia: Optional[int] = None
     titulo: str
     contenido: str
     fecha_publicacion: datetime = datetime.now()
