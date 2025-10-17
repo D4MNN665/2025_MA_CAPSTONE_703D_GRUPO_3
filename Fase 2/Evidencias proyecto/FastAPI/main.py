@@ -11,6 +11,9 @@ from endpoints import (
     endpointBiometria,
     endpointCertificados,   
 )
+from typing import Optional
+from datetime import date
+
 
 # Si usas JWT en otras partes, puedes dejar estos imports (no se usan aquí directamente)
 from fastapi.security import OAuth2PasswordBearer  # noqa: F401
@@ -47,6 +50,7 @@ class Vecino(BaseModel):
     direccion: str
     contrasena: str
     miembro: int = 0
+    fecha_nacimiento: Optional[int] = None  
 
 
 class LoginRequest(BaseModel):
@@ -80,15 +84,28 @@ def crear_vecino(vecino: Vecino):
     db = conectar_db()
     cursor = db.cursor(dictionary=True)
     try:
+        # validar edad 
+        if vecino.fecha_nacimiento:
+            hoy = date.today()
+            anio_nacimiento = vecino.fecha_nacimiento // 10000
+            mes_nacimiento = (vecino.fecha_nacimiento % 10000) // 100
+            dia_nacimiento = vecino.fecha_nacimiento % 100
+            fecha_nac = date(anio_nacimiento, mes_nacimiento, dia_nacimiento)
+            edad = hoy.year - fecha_nac.year - ((hoy.month, hoy.day) < (fecha_nac.month, fecha_nac.day))
+            if edad < 14:
+                raise HTTPException(status_code=400, detail="El vecino debe ser mayor de 14 años.")
+        else:
+            raise HTTPException(status_code=422, detail="El campo fecha_nacimiento es obligatorio")
+        
         # Evitar duplicado de RUT en vecinos
         cursor.execute("SELECT 1 FROM vecinos WHERE rut = %s", (vecino.rut,))
         if cursor.fetchone():
             raise HTTPException(status_code=409, detail="El RUT ya está registrado como vecino.")
 
-        # Insertar vecino
+        # Insertar vecino 
         sql_vecino = """
-            INSERT INTO vecinos (nombre, apellido, rut, direccion, correo, numero_telefono, contrasena, miembro)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+            INSERT INTO vecinos (nombre, apellido, rut, direccion, correo, numero_telefono, contrasena, miembro, fecha_nacimiento)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         cursor.execute(sql_vecino, (
             vecino.nombre,
@@ -98,7 +115,8 @@ def crear_vecino(vecino: Vecino):
             vecino.correo,
             vecino.numero_telefono,
             vecino.contrasena,  # ideal: hash
-            vecino.miembro
+            vecino.miembro,
+            vecino.fecha_nacimiento
         ))
         db.commit()
         id_vecino = cursor.lastrowid
