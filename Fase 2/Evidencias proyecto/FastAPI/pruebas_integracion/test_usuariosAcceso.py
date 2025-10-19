@@ -9,7 +9,6 @@ from main import app
 from fastapi.testclient import TestClient
 
 client = TestClient(app)
-# PRUEBAS DE INTEGRACION SEGUN EL REQUERIMIENTO QUE UN VECINO MAYOR DE 14 AÑOS PUEDE INSCRIBIRSE
 
 def generar_rut_valido():
     # Genera un número de 7 u 8 dígitos
@@ -26,7 +25,7 @@ def generar_rut_valido():
     rut_num = f"{cuerpo:,}".replace(",", ".")
     return f"{rut_num}-{dv}"
 
-
+# PRUEBAS DE INTEGRACION SEGUN EL REQUERIMIENTO QUE UN VECINO MAYOR DE 14 AÑOS PUEDE INSCRIBIRSE
 def test_inscripcion_vecino_mayor_14():
     rut = generar_rut_valido()
     correo = f"{rut}@gmail.com"
@@ -141,3 +140,4 @@ def test_validador_rut_invalido():
     })
     print(response.status_code, response.json())
     assert response.status_code == 422 # Unprocessable Entity {'detail': 'RUT inválido.'} respuesta del front end
+
