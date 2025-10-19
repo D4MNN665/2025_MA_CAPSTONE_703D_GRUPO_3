@@ -1,4 +1,4 @@
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from typing import Optional, Literal
 from datetime import datetime
 
@@ -16,6 +16,8 @@ class Vecino(BaseModel):
     direccion: Optional[str] = None
     miembro: bool = False  # tinyint → bool
     contrasena: Optional[str] = None
+    fecha_nacimiento: Optional[int] = None 
+    
 
 
 # --------------------
@@ -26,7 +28,7 @@ class Usuario(BaseModel):
     id_vecino: int
     nombre: str
     password_hash: str
-    rol: Literal["admin", "directivo", "secretario", "tesorero", "vecino"] = "directivo"
+    rol: Literal["admin", "directivo", "vecino"] = "directivo"
     rut: str
 
 

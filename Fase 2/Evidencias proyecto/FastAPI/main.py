@@ -13,7 +13,8 @@ from endpoints import (
     endpointCertificados,   
 )
 from datetime import date
-
+from fastapi import Depends, Header
+from jwt.jwt_utils import crear_access_token , verificar_access_token
 
 # from fastapi.security import OAuth2PasswordBearer  # noqa: F401
 # from jwt.jwt_utils import create_access_token, verify_token  # noqa: F401
@@ -37,9 +38,16 @@ configurar_cors(app)
 
 
 
-# =========================
-# Modelos Pydantic
-# =========================
+def obtener_usuario_actual(authorization: str = Header(...)):
+    if not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Token inválido")
+    token = authorization.split(" ")[1]
+    payload = verificar_access_token(token)
+    if not payload:
+        raise HTTPException(status_code=401, detail="Token inválido")
+    return payload
+
+
 
 def validar_rut(rut: str) -> bool:
     rut = rut.replace('.', '').replace('-', '')
@@ -56,9 +64,12 @@ def validar_rut(rut: str) -> bool:
     dv_esperado = 'K' if (11 - resto) == 10 else '0' if (11 - resto) == 11 else str(11 - resto)
     return dv == dv_esperado
 
+# =========================
+# Modelos Pydantic
+# =========================
 
 class Vecino(BaseModel):
-    nombre: str
+    nombre: str 
     apellido: str
     rut: str
     correo: EmailStr
@@ -76,6 +87,18 @@ class Vecino(BaseModel):
         rut_num, dv = rut_limpio[:-1], rut_limpio[-1]
         rut_formateado = f"{int(rut_num):,}".replace(",", ".") + '-' + dv
         return rut_formateado
+
+class VecinoUpdate(BaseModel):
+    nombre: Optional[str] = None
+    apellido: Optional[str] = None
+    rut: Optional[str] = None
+    correo: Optional[str] = None
+    fecha_nacimiento: Optional[int] = None
+    numero_telefono: Optional[str] = None
+    direccion: Optional[str] = None
+    miembro: Optional[bool] = None
+    contrasena: Optional[str] = None
+
 
 class LoginRequest(BaseModel):
     rut: str
@@ -213,33 +236,33 @@ def obtener_vecino(id_vecino: int):
 
 
 @app.put("/vecinos/{id_vecino}", tags=["CRUD vecinos"])
-def actualizar_vecino(id_vecino: int, vecino: Vecino):
+def actualizar_vecino(
+    id_vecino: int,
+    vecino: VecinoUpdate,
+    usuario=Depends(obtener_usuario_actual)
+):
+    # Solo permite si el usuario es admin
+    if usuario["rol"] != "admin":
+        raise HTTPException(status_code=403, detail="Solo el admin puede modificar datos ")
     db = conectar_db()
-    cursor = db.cursor()
-    sql = """
-        UPDATE vecinos SET nombre=%s, apellido=%s, rut=%s, correo=%s,
-        numero_telefono=%s, direccion=%s, miembro=%s WHERE id_vecino=%s
-    """
+    cursor = db.cursor(dictionary=True)
+    campos = vecino.model_dump(exclude_unset=True)
+    if not campos:
+        raise HTTPException(status_code=400, detail="No se enviaron datos para actualizar")
+    set_clause = ", ".join([f"{k}=%s" for k in campos.keys()])
+    sql = f"UPDATE vecinos SET {set_clause} WHERE id_vecino=%s"
     try:
-        cursor.execute(sql, (
-            vecino.nombre,
-            vecino.apellido,
-            vecino.rut,
-            vecino.correo,
-            vecino.numero_telefono,
-            vecino.direccion,
-            vecino.miembro,
-            id_vecino
-        ))
+        cursor.execute(sql, (*campos.values(), id_vecino))
         db.commit()
-        return {"mensaje": "Vecino actualizado exitosamente"}
+        cursor.execute("SELECT * FROM vecinos WHERE id_vecino=%s", (id_vecino,))
+        vecino_actualizado = cursor.fetchone()
+        return vecino_actualizado
     except Exception as e:
         db.rollback()
         raise HTTPException(status_code=400, detail=str(e))
     finally:
         cursor.close()
         db.close()
-
 
 @app.delete("/vecinos/{id_vecino}", tags=["CRUD vecinos"])
 def eliminar_vecino(id_vecino: int):
@@ -269,7 +292,10 @@ def login(request: LoginRequest):
         )
         usuario = cursor.fetchone()
         if usuario:
+            token = crear_access_token({"rut": usuario["rut"], "rol": usuario["rol"]})
             return {
+                "access_token": token,
+                "token_type": "bearer",
                 "id_usuario": usuario["id_usuario"],
                 "id_vecino": usuario.get("id_vecino"),  # 👈 agregado
                 "rol": usuario["rol"],
