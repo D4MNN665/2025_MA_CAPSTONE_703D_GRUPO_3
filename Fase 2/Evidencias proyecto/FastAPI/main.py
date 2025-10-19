@@ -1,5 +1,6 @@
+from typing import Optional
 from fastapi import FastAPI, HTTPException
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, field_validator
 from conexion import conectar_db
 from config import configurar_cors
 from endpoints import (
@@ -11,13 +12,11 @@ from endpoints import (
     endpointBiometria,
     endpointCertificados,   
 )
-from typing import Optional
 from datetime import date
 
 
-# Si usas JWT en otras partes, puedes dejar estos imports (no se usan aquí directamente)
-from fastapi.security import OAuth2PasswordBearer  # noqa: F401
-from jwt.jwt_utils import create_access_token, verify_token  # noqa: F401
+# from fastapi.security import OAuth2PasswordBearer  # noqa: F401
+# from jwt.jwt_utils import create_access_token, verify_token  # noqa: F401
 
 
 app = FastAPI(title="API Junta de Vecinos")
@@ -41,6 +40,23 @@ configurar_cors(app)
 # =========================
 # Modelos Pydantic
 # =========================
+
+def validar_rut(rut: str) -> bool:
+    rut = rut.replace('.', '').replace('-', '')
+    if not rut[:-1].isdigit():
+        return False
+    cuerpo = rut[:-1]
+    dv = rut[-1].upper()
+    suma = 0
+    multiplo = 2
+    for c in reversed(cuerpo):
+        suma += int(c) * multiplo
+        multiplo = multiplo + 1 if multiplo < 7 else 2
+    resto = suma % 11
+    dv_esperado = 'K' if (11 - resto) == 10 else '0' if (11 - resto) == 11 else str(11 - resto)
+    return dv == dv_esperado
+
+
 class Vecino(BaseModel):
     nombre: str
     apellido: str
@@ -52,6 +68,14 @@ class Vecino(BaseModel):
     miembro: int = 0
     fecha_nacimiento: Optional[int] = None  
 
+    @field_validator('rut')
+    def validar_y_formatear_rut(cls, v):
+        rut_limpio = v.replace('.', '').replace('-', '')
+        if not validar_rut(rut_limpio):
+            raise ValueError("RUT inválido.")
+        rut_num, dv = rut_limpio[:-1], rut_limpio[-1]
+        rut_formateado = f"{int(rut_num):,}".replace(",", ".") + '-' + dv
+        return rut_formateado
 
 class LoginRequest(BaseModel):
     rut: str
@@ -84,7 +108,7 @@ def crear_vecino(vecino: Vecino):
     db = conectar_db()
     cursor = db.cursor(dictionary=True)
     try:
-        # validar edad 
+        # validar edad minima
         if vecino.fecha_nacimiento:
             hoy = date.today()
             anio_nacimiento = vecino.fecha_nacimiento // 10000
@@ -102,7 +126,7 @@ def crear_vecino(vecino: Vecino):
         if cursor.fetchone():
             raise HTTPException(status_code=409, detail="El RUT ya está registrado como vecino.")
 
-        # Insertar vecino 
+        # Insertar vecino (ahora incluye fecha_nacimiento)
         sql_vecino = """
             INSERT INTO vecinos (nombre, apellido, rut, direccion, correo, numero_telefono, contrasena, miembro, fecha_nacimiento)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s)
@@ -162,7 +186,6 @@ def crear_vecino(vecino: Vecino):
     finally:
         cursor.close()
         db.close()
-
 
 @app.get("/vecinos/")
 def obtener_todos_vecinos():
