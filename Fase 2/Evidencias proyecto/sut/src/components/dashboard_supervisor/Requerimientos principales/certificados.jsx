@@ -19,9 +19,10 @@ const CertificadosDashboard = () => {
 
   // Función para actualizar el estado del certificado
   const actualizarEstado = (id_certificado, nuevoEstado, razon = "") => {
+    const token = localStorage.getItem("access_token");
     fetch(`http://localhost:8000/certificados/residencia/${id_certificado}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
       body: JSON.stringify({ estado: nuevoEstado, razon }),
     }).then((res) => {
       if (res.ok) {
@@ -37,10 +38,12 @@ const CertificadosDashboard = () => {
   };
 
   const enviarPDF = (cert) => {
+    const token = localStorage.getItem("access_token");
     fetch(
       `http://localhost:8000/certificados/enviar_pdf/${cert.id_certificado}`,
       {
         method: "POST",
+        headers: { Authorization: `Bearer ${token}` },
       }
     )
       .then((res) => res.json())

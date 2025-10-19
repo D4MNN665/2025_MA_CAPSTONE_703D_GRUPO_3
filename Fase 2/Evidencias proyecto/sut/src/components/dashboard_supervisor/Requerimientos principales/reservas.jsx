@@ -15,10 +15,27 @@ function Reservas() {
   };
 
   const actualizarEstado = (id_reserva, nuevoEstado) => {
-    axios.put(`http://localhost:8000/reservas/${id_reserva}`, { estado: nuevoEstado })
-      .then(() => fetchReservas())
-      .catch(err => alert("Error al actualizar la reserva"));
-  };
+  const token = localStorage.getItem("access_token");
+  const reserva = reservas.find(r => r.id_reserva === id_reserva);
+  if (!reserva) return alert("Reserva no encontrada");
+
+  axios.put(
+    `http://localhost:8000/reservas/${id_reserva}`,
+    {
+      id_vecino: reserva.id_vecino,
+      nombreSector: reserva.nombreSector,
+      fecha_inicio: reserva.fecha_inicio,
+      estado: nuevoEstado,
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  )
+    .then(() => fetchReservas())
+    .catch(err => alert("Error al actualizar la reserva"));
+};
 
   const eliminarReserva = (id_reserva) => {
     if (window.confirm("¿Seguro que deseas eliminar esta reserva?")) {

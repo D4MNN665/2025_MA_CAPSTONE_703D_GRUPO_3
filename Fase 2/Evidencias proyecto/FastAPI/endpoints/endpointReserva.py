@@ -8,9 +8,29 @@ def formatear_fecha(dt):
     if isinstance(dt, str):
         try:
             dt = datetime.fromisoformat(dt.replace("Z", "+00:00"))
+            return dt.strftime("%d-%m-%Y")
         except Exception:
-            dt = datetime.strptime(dt, "%Y-%m-%d %H:%M:%S")
-    return dt.strftime("%d/%m/%Y")  # Solo día/mes/año
+            return dt.replace("/", "-")
+    return dt.strftime("%d-%m-%Y")
+
+def parsear_fecha(fecha_str):
+    # Intenta ISO primero
+    try:
+        return datetime.fromisoformat(fecha_str.replace("Z", "+00:00"))
+    except Exception:
+        pass
+    # Intenta DD-MM-YYYY
+    try:
+        return datetime.strptime(fecha_str, "%d-%m-%Y")
+    except Exception:
+        pass
+    # Intenta DD/MM/YYYY
+    try:
+        return datetime.strptime(fecha_str, "%d/%m/%Y")
+    except Exception:
+        pass
+    raise ValueError(f"Formato de fecha no soportado: {fecha_str}")
+
 
 router = APIRouter(prefix="/reservas", tags=["CRUD Reservas"])
 
@@ -57,7 +77,7 @@ def crear_reserva(reserva: ReservaCreate):
         raise HTTPException(status_code=400, detail="Ya existe una reserva para este sector y fecha.")
 
     # Convertir fecha_inicio a datetime para MySQL
-    fecha_inicio_dt = datetime.fromisoformat(reserva.fecha_inicio.replace("Z", "+00:00"))
+    fecha_inicio_dt = parsear_fecha(reserva.fecha_inicio)
 
     query = """
     INSERT INTO reservas (id_vecino, nombreSector, fecha_inicio, estado)
@@ -126,7 +146,7 @@ def actualizar_reserva(reserva_id: int, reserva: ReservaCreate):
         conn.close()
         raise HTTPException(status_code=404, detail="Reserva no encontrada")
 
-    fecha_inicio_dt = datetime.fromisoformat(reserva.fecha_inicio.replace("Z", "+00:00"))
+    fecha_inicio_dt = parsear_fecha(reserva.fecha_inicio)
 
     query = """
     UPDATE reservas

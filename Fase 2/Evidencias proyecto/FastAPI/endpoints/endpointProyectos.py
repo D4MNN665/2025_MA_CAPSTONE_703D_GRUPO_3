@@ -8,6 +8,9 @@ from email.message import EmailMessage
 import smtplib
 import os
 
+from dotenv import load_dotenv
+load_dotenv()
+
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
@@ -183,6 +186,8 @@ def actualizar_estado_proyecto(proyecto_id: int, estado_data: EstadoProyecto, ba
 def enviar_correo_estado_proyecto(correo_destino, nombre_vecino, titulo_proyecto, estado, razon=None):
     remitente = EMAIL_USER
     password = EMAIL_PASS
+    print("EMAIL_USER:", EMAIL_USER)
+    print("EMAIL_PASS:", EMAIL_PASS)
     if estado == "rechazado":
         asunto = "Proyecto Rechazado"
         cuerpo = f"Estimado/a {nombre_vecino},\n\nSu proyecto '{titulo_proyecto}' ha sido rechazado.\nMotivo: {razon}\n\nAtentamente,\nJunta de Vecinos"

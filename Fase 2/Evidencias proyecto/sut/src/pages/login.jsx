@@ -13,22 +13,22 @@ const LoginPage = () => {
   const navigate = useNavigate();
 
   const handleChange = (e) => {
-  const campo = e.target.name;
-  const valor = e.target.value;
+    const campo = e.target.name;
+    const valor = e.target.value;
 
-  // Creamos una copia del estado actual
-  const nuevoForm = { ...form };
+    // Creamos una copia del estado actual
+    const nuevoForm = { ...form };
 
-  // Actualizamos el campo correspondiente
-  if (campo === "rut") {
-    nuevoForm.rut = valor;
-  } else if (campo === "contrasena") {
-    nuevoForm.contrasena = valor;
-  }
+    // Actualizamos el campo correspondiente
+    if (campo === "rut") {
+      nuevoForm.rut = valor;
+    } else if (campo === "contrasena") {
+      nuevoForm.contrasena = valor;
+    }
 
-  // Guardamos el nuevo estado
-  setForm(nuevoForm);
-};
+    // Guardamos el nuevo estado
+    setForm(nuevoForm);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -48,15 +48,17 @@ const LoginPage = () => {
       });
       const data = await response.json().catch(() => ({}));
       if (response.ok && data.rol) {
+        // Guarda el access_token si existe
+        if (data.access_token) {
+          localStorage.setItem("access_token", data.access_token);
+        }
         if (data.rol === "admin") {
           alert("Bienvenido Administrador");
           login(data);
           navigate("/dashboard");
         } else if (data.rol === "vecino" || data.rol === "directivo") {
           alert(
-            data.rol === "vecino"
-              ? "Bienvenido Vecino"
-              : "Bienvenido Directivo"
+            data.rol === "vecino" ? "Bienvenido Vecino" : "Bienvenido Directivo"
           );
           login(data);
           navigate("/");
@@ -79,8 +81,9 @@ const LoginPage = () => {
       <h2 className="mb-4">Iniciar Sesión</h2>
       <Form onSubmit={handleSubmit}>
         <Form.Group className="mb-3">
-          <Form.Label>RUT (ej: 12.345.678-9)</Form.Label>
+          <Form.Label htmlFor="rut">RUT (ej: 12.345.678-9)</Form.Label>
           <Form.Control
+            id="rut"
             type="text"
             name="rut"
             value={form.rut}
@@ -90,8 +93,9 @@ const LoginPage = () => {
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label>Contraseña</Form.Label>
+          <Form.Label htmlFor="contrasena">Contraseña</Form.Label>
           <Form.Control
+            id="contrasena"
             type="password"
             name="contrasena"
             value={form.contrasena}
@@ -100,8 +104,17 @@ const LoginPage = () => {
             placeholder="Contraseña"
           />
         </Form.Group>
-        <Button variant="primary" type="submit" disabled={loading} style={{ width: "100%" }}>
-          {loading ? <Spinner animation="border" size="sm" /> : "Iniciar sesión"}
+        <Button
+          variant="primary"
+          type="submit"
+          disabled={loading}
+          style={{ width: "100%" }}
+        >
+          {loading ? (
+            <Spinner animation="border" size="sm" />
+          ) : (
+            "Iniciar sesión"
+          )}
         </Button>
       </Form>
     </div>

@@ -101,8 +101,13 @@ function Vecinos() {
         contrasena: editData.contrasena || "",
         miembro: editData.miembro,
       };
+      const token = localStorage.getItem("access_token");
+      console.log("TOKEN:", token);
       await axios.put(`http://localhost:8000/vecinos/${editId}`, dataToSend, {
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          ...(token && { Authorization: `Bearer ${token}` }),
+        },
       });
       fetchVecinos();
       setEditId(null);

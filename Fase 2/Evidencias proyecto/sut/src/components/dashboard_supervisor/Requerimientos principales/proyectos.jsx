@@ -19,12 +19,19 @@ function Proyectos() {
   }, []);
 
   const actualizarEstado = (id_proyecto, nuevoEstado, razon = "") => {
-    axios.put(`http://localhost:8000/proyectos/${id_proyecto}/estado`, { estado: nuevoEstado, razon })
-      .then(() => {
+    const token = localStorage.getItem("access_token");
+    axios.put(`http://localhost:8000/proyectos/${id_proyecto}/estado`, { estado: nuevoEstado, razon }, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+      .then((res) => {
+        console.log("Respuesta backend:", res.data || res);
         setMensaje(`Proyecto ${nuevoEstado === "aprobado" ? "aprobado" : "rechazado"} correctamente.`);
         fetchProyectos();
       })
-      .catch(() => setMensaje("Error al actualizar el estado del proyecto."));
+      .catch((err) => {
+        setMensaje("Error al actualizar el estado del proyecto.");
+        console.error("Error backend:", err.response?.data || err);
+      });
   };
 
   // Maneja el rechazo abriendo el modal
