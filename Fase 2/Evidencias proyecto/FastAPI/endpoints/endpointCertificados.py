@@ -18,7 +18,7 @@ load_dotenv()
 EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
-@router.post("/certificados/residencia")
+@router.post("/certificados/residencia",tags=["CRUD Certificados"])
 def emitir_certificado(certificado: CertificadoResidencia):
     print("ID VECINO RECIBIDO:", certificado.id_vecino)
     try:
@@ -54,7 +54,7 @@ def emitir_certificado(certificado: CertificadoResidencia):
         if conn:
             conn.close()    
    
-@router.get("/certificados/residencia/{rut}")
+@router.get("/certificados/residencia/{rut}",tags=["CRUD Certificados"])
 def obtener_certificado(rut: str):
     conn = conectar_db()
     cursor = conn.cursor()
@@ -69,7 +69,7 @@ def obtener_certificado(rut: str):
         raise HTTPException(status_code=404, detail="Certificado no encontrado")
     return certificado
 
-@router.get("/certificados/residencia")
+@router.get("/certificados/residencia",tags=["CRUD Certificados"])
 def listar_certificados():
     conn = conectar_db()
     cursor = conn.cursor(dictionary=True)
@@ -83,7 +83,7 @@ class EstadoCertificado(BaseModel):
     estado: str
     razon: str = None  # Para la razón de rechazo
 
-@router.put("/certificados/residencia/{id_certificado}")
+@router.put("/certificados/residencia/{id_certificado}",tags=["CRUD Certificados"])
 def actualizar_estado_certificado(id_certificado: int, estado_data: EstadoCertificado, background_tasks: BackgroundTasks):
     conn = conectar_db()
     cursor = conn.cursor(dictionary=True)
@@ -133,7 +133,7 @@ def enviar_correo_rechazo(correo_destino, razon):
     except Exception as e:
         print(f"Error al enviar correo de rechazo: {e}")
 
-@router.post("/certificados/enviar_pdf/{id_certificado}")
+@router.post("/certificados/enviar_pdf/{id_certificado}",tags=["CRUD Certificados"])
 def enviar_pdf_certificado(id_certificado: int, background_tasks: BackgroundTasks):
     conn = conectar_db()
     cursor = conn.cursor(dictionary=True)
