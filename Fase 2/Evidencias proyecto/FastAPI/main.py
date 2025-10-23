@@ -1,5 +1,9 @@
 from typing import Optional
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.responses import JSONResponse
+from fastapi.exception_handlers import RequestValidationError
+from fastapi.exceptions import RequestValidationError
+
 from pydantic import BaseModel, EmailStr, field_validator
 from conexion import conectar_db
 from config import configurar_cors
@@ -16,8 +20,7 @@ from datetime import date
 from fastapi import Depends, Header
 from jwt.jwt_utils import crear_access_token , verificar_access_token
 
-# from fastapi.security import OAuth2PasswordBearer  # noqa: F401
-# from jwt.jwt_utils import create_access_token, verify_token  # noqa: F401
+# from fastapi.security import OAuth2PasswordBearer
 
 
 app = FastAPI(title="API Junta de Vecinos")
@@ -123,6 +126,22 @@ class RegistroIdentidad(BaseModel):
 @app.get("/")
 def read_root():
     return {"message": "API Junta de Vecinos"}
+
+#  handler de excepciones global para validaciones de Pydantic
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(request: Request, exc: RequestValidationError):
+    errores = []
+    for error in exc.errors():
+        campo = ".".join(str(x) for x in error["loc"] if x != "body")
+        mensaje = error["msg"]
+        errores.append(f"Error en '{campo}': {mensaje}")
+    return JSONResponse(
+        status_code=422, 
+        content={"mensaje": "Datos inválidos en la solicitud", "errores": errores}
+    )
+
+#
+
 
 
 # ---------- CRUD Vecinos (crea también usuario) ----------

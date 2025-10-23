@@ -23,19 +23,37 @@ def emitir_certificado(certificado: CertificadoResidencia):
     print("ID VECINO RECIBIDO:", certificado.id_vecino)
     try:
         conn = conectar_db()
-        cursor = conn.cursor()
+        cursor = conn.cursor(dictionary=True)
+
+        # Validar motivo no vacío
+        if not certificado.motivo or not certificado.motivo.strip():
+            raise HTTPException(status_code=400, detail="El motivo no puede estar vacío")
+
+        # Validar que el vecino existe
+        cursor.execute("SELECT * FROM vecinos WHERE id_vecino = %s", (certificado.id_vecino,))
+        vecino = cursor.fetchone()
+        if not vecino:
+            raise HTTPException(status_code=404, detail="Vecino no encontrado")
+
         cursor.execute(
             "INSERT INTO certificados (rut, nombreVecino, nacionalidad, domicilio, tipo_residencia, motivo, id_vecino) VALUES (%s, %s, %s, %s, %s, %s, %s)",
             (certificado.rut, certificado.nombreVecino, certificado.nacionalidad, certificado.domicilio, certificado.tipo_residencia, certificado.motivo, certificado.id_vecino)
         )
         conn.commit()
-        cursor.close()
-        conn.close()
         return {"mensaje": "Certificado de residencia emitido con éxito"}
+    except HTTPException:
+        raise
     except Exception as e:
         print("Error al emitir certificado:", e)
+        if conn:
+            conn.rollback()
         raise HTTPException(status_code=500, detail=str(e))
-
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()    
+   
 @router.get("/certificados/residencia/{rut}")
 def obtener_certificado(rut: str):
     conn = conectar_db()
