@@ -94,7 +94,8 @@ const JuntaVecinosPage = () => {
                 </Nav.Link>
                 <Nav.Link
                   className="nav-link-hover"
-                  href="#actividades"
+                  as={Link}
+                  to="/actividades"
                   style={!isLoggedIn ? disabledStyle : {}}
                   disabled={!isLoggedIn}
                 >
@@ -163,8 +164,7 @@ const JuntaVecinosPage = () => {
           </div>
           <div id="noticias" className="noticias mt-5">
             <h3 className="text-center mb-4">Noticias de último momento</h3>
-            <Carousel
-              className="shadow rounded">
+            <Carousel className="shadow rounded">
               {noticias.length === 0 ? (
                 <Carousel.Item>
                   <div
@@ -194,7 +194,7 @@ const JuntaVecinosPage = () => {
                             color: "#222",
                             background: "rgba(255,255,255,0.85)",
                             padding: "8px",
-                            borderRadius: "8px"
+                            borderRadius: "8px",
                           }}
                         >
                           {noticia.contenido}

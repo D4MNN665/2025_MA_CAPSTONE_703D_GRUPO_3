@@ -77,46 +77,54 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="container mt-5" style={{ maxWidth: 400 }}>
-      <h2 className="mb-4">Iniciar Sesión</h2>
-      <Form onSubmit={handleSubmit}>
-        <Form.Group className="mb-3">
-          <Form.Label htmlFor="rut">RUT (ej: 12.345.678-9)</Form.Label>
-          <Form.Control
-            id="rut"
-            type="text"
-            name="rut"
-            value={form.rut}
-            onChange={handleChange}
-            required
-            placeholder="RUT"
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label htmlFor="contrasena">Contraseña</Form.Label>
-          <Form.Control
-            id="contrasena"
-            type="password"
-            name="contrasena"
-            value={form.contrasena}
-            onChange={handleChange}
-            required
-            placeholder="Contraseña"
-          />
-        </Form.Group>
-        <Button
-          variant="primary"
-          type="submit"
-          disabled={loading}
-          style={{ width: "100%" }}
-        >
-          {loading ? (
-            <Spinner animation="border" size="sm" />
-          ) : (
-            "Iniciar sesión"
-          )}
-        </Button>
-      </Form>
+    <div className="container-fluid min-vh-100 p-0" style={{ background: "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)" }}>
+      <div className="container d-flex justify-content-center align-items-center min-vh-100">
+        <div className="card p-4 shadow bg-white" style={{ maxWidth: 400, width: "100%" }}>
+          <div className="text-center mb-4">
+            <i className="bi bi-person-circle" style={{ fontSize: 48, color: "#0d6efd" }}></i>
+            <h2 className="fw-bold mt-2 text-primary">Iniciar Sesión</h2>
+          </div>
+          <Form onSubmit={handleSubmit}>
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor="rut">RUT (ej: 12.345.678-9)</Form.Label>
+              <Form.Control
+                id="rut"
+                type="text"
+                name="rut"
+                value={form.rut}
+                onChange={handleChange}
+                required
+                placeholder="RUT"
+              />
+            </Form.Group>
+            <Form.Group className="mb-3">
+              <Form.Label htmlFor="contrasena">Contraseña</Form.Label>
+              <Form.Control
+                id="contrasena"
+                type="password"
+                name="contrasena"
+                value={form.contrasena}
+                onChange={handleChange}
+                required
+                placeholder="Contraseña"
+              />
+            </Form.Group>
+            <Button
+              variant="primary"
+              type="submit"
+              disabled={loading}
+              style={{ width: "100%" }}
+              className="d-flex align-items-center justify-content-center gap-2"
+            >
+              {loading ? (
+                <Spinner animation="border" size="sm" />
+              ) : (
+                <><i className="bi bi-box-arrow-in-right"></i> Iniciar sesión</>
+              )}
+            </Button>
+          </Form>
+        </div>
+      </div>
     </div>
   );
 };

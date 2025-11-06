@@ -8,6 +8,7 @@ import LoginPage from "./pages/login.jsx";
 import CertificadosVecinosPage from "./pages/certificados-vecinos-page.jsx";
 import ReservaEspaciosPage from "./pages/reserva_espacios.jsx";
 import ProyectosVecinosForm from "./pages/proyectos_vecinos.jsx";
+import Actividades from "./pages/actividades.jsx";
 
 function App() {
   return (
@@ -28,6 +29,7 @@ function App() {
           <Route path="/certificados" element={<CertificadosVecinosPage />} /> {/* Usa la página puente */}
           <Route path="/reservas" element={<ReservaEspaciosPage />} />
           <Route path="/proyectos" element={<ProyectosVecinosForm />} />
+          <Route path="/actividades" element={<Actividades />} />
         </Routes>
       </div>
     </Router>
