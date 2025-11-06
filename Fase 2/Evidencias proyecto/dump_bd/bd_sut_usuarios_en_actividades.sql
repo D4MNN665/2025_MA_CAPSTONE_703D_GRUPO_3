@@ -16,33 +16,29 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `actividades`
+-- Table structure for table `usuarios_en_actividades`
 --
 
-DROP TABLE IF EXISTS `actividades`;
+DROP TABLE IF EXISTS `usuarios_en_actividades`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `actividades` (
-  `id_actividad` int NOT NULL AUTO_INCREMENT,
-  `titulo` varchar(100) NOT NULL,
-  `descripcion` text,
-  `fecha_inicio` datetime NOT NULL,
-  `fecha_fin` datetime NOT NULL,
-  `cupo_max` int NOT NULL,
-  `cupo_actual` int NOT NULL DEFAULT '0',
-  `id_usuario` int NOT NULL,
-  PRIMARY KEY (`id_actividad`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `usuarios_en_actividades` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `usuario_id` int NOT NULL,
+  `actividad_id` int NOT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `usuario_id` (`usuario_id`,`actividad_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `actividades`
+-- Dumping data for table `usuarios_en_actividades`
 --
 
-LOCK TABLES `actividades` WRITE;
-/*!40000 ALTER TABLE `actividades` DISABLE KEYS */;
-INSERT INTO `actividades` VALUES (9,'Actividad en el parque ',':(','2025-11-04 03:24:06','2025-11-04 04:24:06',5,2,76),(10,'asdasd','asdasddsa','2025-11-05 22:43:04','2025-11-05 23:43:04',5,1,6);
-/*!40000 ALTER TABLE `actividades` ENABLE KEYS */;
+LOCK TABLES `usuarios_en_actividades` WRITE;
+/*!40000 ALTER TABLE `usuarios_en_actividades` DISABLE KEYS */;
+INSERT INTO `usuarios_en_actividades` VALUES (3,6,9),(2,76,7),(1,76,8);
+/*!40000 ALTER TABLE `usuarios_en_actividades` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

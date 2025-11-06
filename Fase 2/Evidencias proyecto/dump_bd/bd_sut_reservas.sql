@@ -40,7 +40,7 @@ CREATE TABLE `reservas` (
 
 LOCK TABLES `reservas` WRITE;
 /*!40000 ALTER TABLE `reservas` DISABLE KEYS */;
-INSERT INTO `reservas` VALUES (31,18,'Plaza La Fortuna','2025-10-17 00:00:00','pendiente'),(32,18,'Plaza Pomaire','2025-10-17 00:00:00','pendiente');
+INSERT INTO `reservas` VALUES (31,18,'Plaza La Fortuna','2025-10-17 00:00:00','aprobado');
 /*!40000 ALTER TABLE `reservas` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-15 21:08:51
+-- Dump completed on 2025-11-06 20:24:15

@@ -31,7 +31,7 @@ CREATE TABLE `noticias` (
   PRIMARY KEY (`id_noticia`),
   KEY `fk_noticia_autor_idx` (`autor_id`),
   CONSTRAINT `fk_noticia_autor` FOREIGN KEY (`autor_id`) REFERENCES `usuarios` (`id_usuario`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -40,7 +40,7 @@ CREATE TABLE `noticias` (
 
 LOCK TABLES `noticias` WRITE;
 /*!40000 ALTER TABLE `noticias` DISABLE KEYS */;
-INSERT INTO `noticias` VALUES (3,'Esto es una Noticia de prueba desde la bd','Hola','2025-08-26 19:24:17',1),(4,'Esto es otra noticia de prueba desde la bd ','Hola 2','2025-08-26 19:24:17',1);
+INSERT INTO `noticias` VALUES (8,'Titulo noticia 1','Contenido ','2025-10-16 00:35:58',1);
 /*!40000 ALTER TABLE `noticias` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +53,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-10-15 21:08:51
+-- Dump completed on 2025-11-06 20:24:16
