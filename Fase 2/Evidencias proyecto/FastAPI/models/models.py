@@ -36,7 +36,7 @@ class Usuario(BaseModel):
 # TABLA ACTIVIDADES
 # --------------------
 class Actividad(BaseModel):
-    id_actividad: int
+    id_actividad: Optional[str] = None
     titulo: str
     descripcion: Optional[str] = None
     fecha_inicio: datetime

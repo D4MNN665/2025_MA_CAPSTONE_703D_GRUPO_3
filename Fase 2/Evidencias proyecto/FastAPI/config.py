@@ -5,17 +5,28 @@ from fastapi import FastAPI
 tags_metadata = [
     {
         "name": "CRUD vecinos",
-        "description": "es solo un crud de empleado para el admin :' ",
+        "description": "es solo un crud de vecinos para el admin: ",
     },
     {
         "name": "CRUD Noticias",
-        "description": "es solo un crud de empleado para el admin :' ",
+        "description": "es solo un crud de noticias para el admin: ",
     },
     {
         "name": "CRUD Proyectos",
-        "description": "es solo un crud de empleado para el admin :' ",
+        "description": "es solo un crud de proyectos para el admin: ",
     },
-
+    {
+        "name": "CRUD Reservas",
+        "description": "es solo un crud de reservas para el admin: ",
+    },
+    {
+        "name": "Autenticación",
+        "description": "Manejo de autenticación y generación de tokens JWT",
+    },
+    {
+        "name": "Actividades",
+        "description": "Gestión de actividades para vecinos",
+    }
 ]
 
 

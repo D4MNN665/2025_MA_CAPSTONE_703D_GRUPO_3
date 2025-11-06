@@ -20,7 +20,7 @@ from datetime import date
 from fastapi import Depends, Header
 from jwt.jwt_utils import crear_access_token , verificar_access_token
 
-# from fastapi.security import OAuth2PasswordBearer
+# from fastapi.security import OAuth2PasswordBearer | No se usa por ahora
 
 
 app = FastAPI(title="API Junta de Vecinos")
@@ -42,12 +42,24 @@ configurar_cors(app)
 
 
 def obtener_usuario_actual(authorization: str = Header(...)):
+    # Recibe el header 'Authorization' de la solicitud HTTP.
+    # El valor esperado es: "Bearer <token_jwt>"
+
     if not authorization.startswith("Bearer "):
+        # Si el header no comienza con 'Bearer ', el token no es válido.
         raise HTTPException(status_code=401, detail="Token inválido")
+
+    # Extrae el token JWT quitando el prefijo 'Bearer '
     token = authorization.split(" ")[1]
+
+    # Llama a la función que valida el token y obtiene el payload (datos del usuario)
     payload = verificar_access_token(token)
+
     if not payload:
+        # Si el token es inválido o expiró, retorna error 401 (no autorizado)
         raise HTTPException(status_code=401, detail="Token inválido")
+
+    # Si todo está bien, retorna el payload (información del usuario autenticado)
     return payload
 
 
@@ -125,7 +137,7 @@ class RegistroIdentidad(BaseModel):
 # =========================
 @app.get("/")
 def read_root():
-    return {"message": "API Junta de Vecinos"}
+    return {"API Junta de Vecinos"}
 
 #  handler de excepciones global para validaciones de Pydantic
 @app.exception_handler(RequestValidationError)
@@ -258,7 +270,7 @@ def obtener_vecino(id_vecino: int):
 def actualizar_vecino(
     id_vecino: int,
     vecino: VecinoUpdate,
-    usuario=Depends(obtener_usuario_actual)
+    usuario=Depends(obtener_usuario_actual) # primero se ejecuta esta funcion antes que el endpoint
 ):
     # Solo permite si el usuario es admin
     if usuario["rol"] != "admin":
@@ -268,6 +280,13 @@ def actualizar_vecino(
     campos = vecino.model_dump(exclude_unset=True)
     if not campos:
         raise HTTPException(status_code=400, detail="No se enviaron datos para actualizar")
+     # Verifica que el vecino existe antes de actualizar
+    cursor.execute("SELECT * FROM vecinos WHERE id_vecino=%s", (id_vecino,))
+    if not cursor.fetchone():
+        cursor.close()
+        db.close()
+        raise HTTPException(status_code=404, detail="Vecino no encontrado")
+
     set_clause = ", ".join([f"{k}=%s" for k in campos.keys()])
     sql = f"UPDATE vecinos SET {set_clause} WHERE id_vecino=%s"
     try:
