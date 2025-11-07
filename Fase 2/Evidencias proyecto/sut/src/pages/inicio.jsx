@@ -214,11 +214,11 @@ const JuntaVecinosPage = () => {
             <h3 className="mb-3">Datos de Contacto</h3>
             <p className="mb-2">
               <i className="bi bi-envelope me-2"></i>
-              junta.vecinosxd@gmail.cl
+              junta.vecinos2025sut@gmail.com
             </p>
             <p className="mb-2">
               <i className="bi bi-telephone me-2"></i>
-              +56 9 XXXX XXXX
+              +56 9 5199 5369
             </p>
           </div>
           <p className="text-center text-muted mt-3">
