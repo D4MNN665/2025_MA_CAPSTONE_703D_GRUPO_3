@@ -3,6 +3,9 @@ from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta, timezone
 import os 
 from fastapi import HTTPException, status, Depends
+from dotenv import load_dotenv 
+
+load_dotenv()
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
