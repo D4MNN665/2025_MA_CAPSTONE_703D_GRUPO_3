@@ -7,12 +7,13 @@ from fastapi.testclient import TestClient
 
 client = TestClient(app)
 
-def obtener_token(rut, contrasena):
+def obtener_token(rut, contrasena): # 
     response = client.post("/login", json={"rut": rut, "contrasena": contrasena})
-    assert response.status_code == 200 # OK
     #print("Status code:", response.status_code)
     #print("Response text:", response.text)
-    return response.json()["access_token"]
+    assert response.status_code == 200  # OK
+    token = response.json()["access_token"]
+    return token
 
 def test_admin_puede_modificar_datos_sensibles():
     token = obtener_token("20.722.122-8", "147") # Credenciales de admin
