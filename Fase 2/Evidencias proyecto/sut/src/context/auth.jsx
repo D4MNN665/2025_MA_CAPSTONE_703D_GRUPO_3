@@ -25,6 +25,18 @@ export function AuthProvider({ children }) {
   // Ejemplo de función de login
   const login = (userData) => {
     setUser(userData);
+    // almacenar token separado para el cliente HTTP (si viene)
+    try {
+      if (userData?.access_token) {
+        localStorage.setItem("access_token", userData.access_token);
+      }
+      if (userData?.id_uv !== undefined) {
+        // guardar id_uv también para páginas que no decodifiquen el token
+        localStorage.setItem("id_uv", String(userData.id_uv));
+      }
+    } catch (e) {
+      // ignore storage errors
+    }
     // localStorage se actualiza automáticamente por el useEffect
   };
 

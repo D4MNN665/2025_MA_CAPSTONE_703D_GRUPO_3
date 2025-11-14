@@ -25,18 +25,28 @@ const CertificadoResidencia = ({ rut, id_vecino }) => {
       return;
     }
     try {
+      const token = localStorage.getItem("access_token");
+      const headers = { "Content-Type": "application/json" };
+      if (token) headers.Authorization = `Bearer ${token}`;
+
+      const id_uv_local = localStorage.getItem("id_uv");
+      console.log("ID UV local:", id_uv_local);
+
+      const payload = {
+        rut: formRut,
+        nombreVecino: formnombreVecino,
+        nacionalidad: formNacionalidad,
+        domicilio: formDomicilio,
+        tipo_residencia: formTipoResidencia,
+        motivo: formMotivo,
+        id_vecino: id_vecino,
+      };
+      if (id_uv_local) payload.id_uv = Number(id_uv_local);
+
       const response = await fetch("http://localhost:8000/certificados/residencia", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          rut: formRut,
-          nombreVecino: formnombreVecino,
-          nacionalidad: formNacionalidad,
-          domicilio: formDomicilio,
-          tipo_residencia: formTipoResidencia,
-          motivo: formMotivo,
-          id_vecino: id_vecino,
-        }),
+        headers,
+        body: JSON.stringify(payload),
       });
       if (response.ok) {
         setMensaje("Solicitud enviada correctamente");
@@ -54,8 +64,8 @@ const CertificadoResidencia = ({ rut, id_vecino }) => {
     }
   };
 
-  return (
-    <div className="container-fluid min-vh-100 p-0" style={{ background: "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)" }}>
+ return (
+   <div className="container-fluid min-vh-100 p-0 page-gradient-brand">
       <div className="container py-5">
         <div className="row justify-content-center">
           <div className="col-md-7">

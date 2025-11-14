@@ -69,9 +69,17 @@ const ReservaEspaciosPage = () => {
   };
 
   try {
+    // attach Authorization header and optional id_uv fallback
+    const token = localStorage.getItem('access_token');
+    const headers = { 'Content-Type': 'application/json' };
+    if (token) headers.Authorization = `Bearer ${token}`;
+    const id_uv_local = localStorage.getItem('id_uv') || user.id_uv;
+    if (id_uv_local) reserva.id_uv = Number(id_uv_local);
+    console.log('[RESERVAS] token?', !!token, 'id_uv_local', id_uv_local);
+
     const response = await fetch(URL, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers,
       body: JSON.stringify(reserva),
     });
 
@@ -101,88 +109,77 @@ const ReservaEspaciosPage = () => {
 };
 
   return (
-    <div className="container-fluid min-vh-100 p-0" style={{ background: "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)" }}>
-      <div className="container p-0">
+    <div className="container-fluid min-vh-100 p-0 page-gradient-brand">
+      <div className="container py-4">
         <div className="text-center mb-4">
-          <h1 className="display-5 fw-bold text-primary">Reserva de Espacios</h1>
-          <p className="lead">Seleccione un espacio para reservar</p>
+          <h1 className="display-5 fw-bold on-brand-title">Reserva de Espacios</h1>
+          <p className="lead on-brand-subtitle">Seleccione un espacio para reservar.</p>
         </div>
-        <div className="row">
-          {zonas.map((zona, idx) => (
-            <div className="col-md-3 mb-4" key={idx}>
-              <div
-                className={`card h-100 text-center shadow-sm bg-white ${zonaSeleccionada === zona ? "border-primary" : ""}`}
-                style={{ cursor: "pointer" }}
-                onClick={() => handleZonaClick(zona)}
-              >
-                <div className="card-body">
-                  <h5 className="card-title text-primary">
-                    <i className="bi bi-geo-alt me-2"></i>
-                    {zona.nombre}
-                  </h5>
-                  <img
-                    src={zona.imagen}
-                    alt={zona.nombre}
-                    className="img-fluid my-3"
-                    style={{ maxHeight: "120px", objectFit: "contain" }}
-                  />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {zonaSeleccionada && (
-          <div className="mt-4">
-            <div className="row justify-content-center">
-              <div className="col-lg-6">
-                <form onSubmit={handleSubmit} className="card p-4 shadow bg-white">
-                  <h4 className="mb-3 text-primary">Reservar en {zonaSeleccionada.nombre}</h4>
-                  <div className="mb-3">
-                    <label className="form-label">Plaza</label>
-                    <select
-                      className="form-select"
-                      value={plazaSeleccionada}
-                      onChange={(e) => setPlazaSeleccionada(e.target.value)}
-                      required
-                    >
-                      <option value="">Seleccione una opción</option>
-                      {zonaSeleccionada.plazas.map((plaza, idx) => (
-                        <option key={idx} value={plaza}>
-                          {plaza}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div className="mb-3">
-                    <label className="form-label">Fecha</label>
-                    <input
-                      type="date"
-                      className="form-control"
-                      value={fecha}
-                      onChange={(e) => setFecha(e.target.value)}
-                      required
-                      min={getMinReservationDateString()}
-                    />
-                  </div>
-                  <button type="submit" className="btn btn-primary w-100">
-                    <i className="bi bi-calendar-plus me-2"></i>Reservar
-                  </button>
-                  {mensaje && (
-                    <div className="alert alert-success mt-3" role="alert">
-                      {mensaje}
-                    </div>
-                  )}
-                  {error && (
-                    <div className="alert alert-danger mt-3" role="alert">
-                      {error}
-                    </div>
-                  )}
-                </form>
-              </div>
+      <div className="row g-3">
+        {zonas.map((zona, idx) => (
+          <div className="col-md-3 mb-4" key={idx}>
+            <div
+              className={`card-tile h-100 text-center ${zonaSeleccionada === zona ? "border-primary" : ""}`}
+              style={{ cursor: "pointer" }}
+              onClick={() => handleZonaClick(zona)}
+            >
+              <i className="bi bi-geo-alt" style={{ fontSize: "2rem" }}></i>
+              <h5 className="mt-2">{zona.nombre}</h5>
+              <p className="mb-0 text-muted">Ver plazas disponibles</p>
             </div>
           </div>
-        )}
+        ))}
+      </div>
+
+      {zonaSeleccionada && (
+        <div key={zonaSeleccionada.nombre} className="mt-4 animate-in">
+          <div className="card p-4 shadow bg-white">
+          <h4 className="mb-3">Reservar en {zonaSeleccionada.nombre}</h4>
+          <form onSubmit={handleSubmit} className="mb-0">
+            <div className="mb-3">
+              <label className="form-label">Plaza</label>
+              <select
+                className="form-select"
+                value={plazaSeleccionada}
+                onChange={(e) => setPlazaSeleccionada(e.target.value)}
+                required
+              >
+                <option value="">Seleccione una opción</option>
+                {zonaSeleccionada.plazas.map((plaza, idx) => (
+                  <option key={idx} value={plaza}>
+                    {plaza}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="mb-3">
+              <label className="form-label">Fecha</label>
+              <input
+                type="date"
+                className="form-control"
+                value={fecha}
+                onChange={(e) => setFecha(e.target.value)}
+                required
+                min={getMinReservationDateString()}
+              />
+            </div>
+            <button type="submit" className="btn btn-primary">
+              Reservar
+            </button>
+          </form>
+          </div>
+          {mensaje && (
+            <div className="alert alert-success" role="alert">
+              {mensaje}
+            </div>
+          )}
+          {error && (
+            <div className="alert alert-danger" role="alert">
+              {error}
+            </div>
+          )}
+        </div>
+      )}
       </div>
     </div>
   );

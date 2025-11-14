@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import FastAPI
 
 tags_metadata = [
     {
@@ -35,13 +34,13 @@ app.version = "1.0.0"
 
 
 def configurar_cors(app):
+    # En desarrollo permitimos los orígenes locales concretos.
+    # Evitar "*" cuando allow_credentials=True para no provocar ausencia del header.
     app.add_middleware(
         CORSMiddleware,
         allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["*"],
     )
-
-
-configurar_cors(app)

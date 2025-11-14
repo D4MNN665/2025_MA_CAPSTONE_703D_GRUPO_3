@@ -1,4 +1,4 @@
-from pydantic import BaseModel, field_validator, Field
+from pydantic import BaseModel, field_validator
 from typing import Optional, Literal
 from datetime import datetime
 
@@ -36,7 +36,7 @@ class Usuario(BaseModel):
 # TABLA ACTIVIDADES
 # --------------------
 class Actividad(BaseModel):
-    id_actividad: Optional[str] = None
+    id_actividad: int
     titulo: str
     descripcion: Optional[str] = None
     fecha_inicio: datetime
@@ -50,24 +50,17 @@ class Actividad(BaseModel):
 # --------------------
 # TABLA CERTIFICADOS
 # --------------------
-class CertificadoResidencia(BaseModel): 
-    # la expresion Field(...) significa que es obligatorio
-    rut: str = Field(..., min_length=9, max_length=12)
-    nombreVecino: str = Field(..., min_length=2)
-    nacionalidad: str = Field(..., min_length=2)
-    domicilio: str = Field(..., min_length=5)
-    tipo_residencia: Literal["propietario", "arrendatario", "otro"]
-    motivo: str = Field(..., min_length=1)
-    id_vecino: Optional[int] = None
-    razon_rechazo: Optional[str] = None
+class CertificadoResidencia(BaseModel):
+    rut: str
+    nombreVecino: str
+    nacionalidad: str
+    domicilio: str
+    tipo_residencia: str
+    motivo: str
+    id_vecino: int
+    razon_rechazo: Optional[str] = None  
+
     
-    @field_validator("motivo", "nombreVecino", "nacionalidad", "domicilio")
-    @classmethod
-    def no_espacios(cls, v):
-        print("Validando campo:", v)
-        if not v or not v.strip():
-            raise ValueError("El campo no puede estar vacío ni contener solo espacios")
-        return v.strip()
 # --------------------
 # TABLA RESERVAS
 # --------------------

@@ -8,12 +8,13 @@ import LoginPage from "./pages/login.jsx";
 import CertificadosVecinosPage from "./pages/certificados-vecinos-page.jsx";
 import ReservaEspaciosPage from "./pages/reserva_espacios.jsx";
 import ProyectosVecinosForm from "./pages/proyectos_vecinos.jsx";
-import Actividades from "./pages/actividades.jsx";
+import Actividades from "./pages/actividades";
+import Historial from "./pages/historial.jsx";
 
 function App() {
   return (
     <Router>
-      <div className="App">
+      <div className="App app-shell">
         <Routes>
           <Route path="/" element={<JuntaVecinosPage />} />
           <Route path="/login" element={<LoginPage />} />
@@ -30,6 +31,8 @@ function App() {
           <Route path="/reservas" element={<ReservaEspaciosPage />} />
           <Route path="/proyectos" element={<ProyectosVecinosForm />} />
           <Route path="/actividades" element={<Actividades />} />
+          <Route path="/historial" element={<Historial />} />
+
         </Routes>
       </div>
     </Router>

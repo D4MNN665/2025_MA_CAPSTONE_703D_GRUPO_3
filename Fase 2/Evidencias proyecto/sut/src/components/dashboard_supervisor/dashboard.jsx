@@ -1,18 +1,20 @@
 import React, { useState, useEffect } from "react";
 import { Link, Routes, Route } from "react-router-dom";
 import Vecinos from "./Requerimientos principales/vecinos";
+import Certificados from "./Requerimientos principales/certificados";
 import Proyectos from "./Requerimientos principales/proyectos";
 import Reservas from "./Requerimientos principales/reservas";
 import Noticias from "./Requerimientos principales/noticias";
 import Notificaciones from "./Requerimientos principales/notificaciones";
 import CertificadosDashboard from "./Requerimientos principales/certificados";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Modal, Button, Card, Row, Col } from "react-bootstrap";
 import { useAuth } from "../../context/auth"; 
 import { useNavigate } from "react-router-dom"; 
+import { Modal, Button, Card, Row, Col } from "react-bootstrap";
 import "../../css dashboard/sb-admin-2.css";
 import "../../css dashboard/sb-admin-2.min.css";
 import axios from "axios";
+import Actividades from "./Requerimientos principales/actividades"; // 1. Importa el componente
 
 function Dashboard() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
@@ -22,24 +24,42 @@ function Dashboard() {
   const [noticias, setNoticias] = useState([]);
   const [proyectos, setProyectos] = useState([]);
   const [reservas, setReservas] = useState([]);
-
-  const { logout } = useAuth(); 
+  
+  const { user, logout } = useAuth(); 
   const navigate = useNavigate(); 
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [resVecinos, resNoticias, resProyectos, resReservas] =
-          await Promise.all([
-            axios.get("http://localhost:8000/vecinos"),
-            axios.get("http://localhost:8000/noticias"),
-            axios.get("http://localhost:8000/proyectos"),
-            axios.get("http://localhost:8000/reservas"),
-          ]);
-        setVecinos(resVecinos.data);
-        setNoticias(resNoticias.data);
-        setProyectos(resProyectos.data);
-        setReservas(resReservas.data);
+        // obtener id_uv desde auth o fallback a localStorage
+        let id_uv = user?.id_uv ?? null;
+        if (!id_uv) {
+          const s = localStorage.getItem("id_uv");
+          id_uv = s ? Number(s) : null;
+        }
+        if (!id_uv) {
+          // si no hay id_uv, mostrar 0 en el resumen
+          setVecinos([]);
+          setNoticias([]);
+          setProyectos([]);
+          setReservas([]);
+          return;
+        }
+
+        const token = localStorage.getItem("access_token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+        const [resVecinos, resNoticias, resProyectos, resReservas] = await Promise.all([
+          axios.get(`http://localhost:8000/vecinos/uv/${id_uv}`, { headers }),
+          axios.get(`http://localhost:8000/noticias/uv/${id_uv}`, { headers }),
+          axios.get(`http://localhost:8000/proyectos/uv/${id_uv}`, { headers }),
+          axios.get(`http://localhost:8000/reservas/uv/${id_uv}`, { headers }),
+        ]);
+
+        setVecinos(Array.isArray(resVecinos.data) ? resVecinos.data : []);
+        setNoticias(Array.isArray(resNoticias.data) ? resNoticias.data : []);
+        setProyectos(Array.isArray(resProyectos.data) ? resProyectos.data : []);
+        setReservas(Array.isArray(resReservas.data) ? resReservas.data : []);
       } catch (err) {
         console.error("Error al traer datos:", err);
       }
@@ -51,14 +71,8 @@ function Dashboard() {
     <div id="page-top">
       <div id="wrapper" className={sidebarCollapsed ? "toggled" : ""}>
         {/* Sidebar */}
-        <ul
-          className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion sidebar-centered"
-          style={{ paddingTop: "1rem", paddingBottom: "1rem" }}
-        >
-          <Link
-            className="sidebar-brand d-flex align-items-center justify-content-center"
-            to="/dashboard"
-          >
+        <ul className="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion sidebar-centered" style={{ paddingTop: '1rem', paddingBottom: '1rem' }}>
+          <Link className="sidebar-brand d-flex align-items-center justify-content-center" to="/dashboard">
             <div className="sidebar-brand-icon rotate-n-15">
               <i className="fas fa-laugh-wink"></i>
             </div>
@@ -66,60 +80,36 @@ function Dashboard() {
               Admin Dashboard <sup>APT</sup>
             </div>
           </Link>
-          <hr className="sidebar-divider my-0" style={{ margin: "0.5rem 0" }} />
+          <hr className="sidebar-divider my-0" style={{ margin: '0.5rem 0' }} />
           <li className="nav-item active">
             <Link className="nav-link sidebar-item" to="/dashboard">
               <i className="fas fa-fw fa-tachometer-alt"></i>
-              <span style={{ marginLeft: "8px" }}>Dashboard</span>
+              <span style={{ marginLeft: '8px' }}>Dashboard</span>
             </Link>
           </li>
-          <hr className="sidebar-divider" style={{ margin: "0.5rem 0" }} />
+          <hr className="sidebar-divider" style={{ margin: '0.5rem 0' }} />
 
-          <div
-            className="sidebar-heading"
-            style={{
-              marginBottom: "0.5rem",
-              marginTop: "0.5rem",
-              textAlign: "center",
-            }}
-          >
-            Gestión
-          </div>
+          <div className="sidebar-heading" style={{ marginBottom: '0.5rem', marginTop: '0.5rem', textAlign: 'center' }}>Gestión</div>
           <li className="nav-item">
-            <Link className="nav-link sidebar-item" to="/dashboard/vecinos">
-              Vecinos
-            </Link>
+            <Link className="nav-link sidebar-item" to="/dashboard/vecinos">Vecinos</Link>
           </li>
           <li className="nav-item">
-            <Link
-              className="nav-link sidebar-item"
-              to="/dashboard/certificados"
-            >
-              Certificados
-            </Link>
+            <Link className="nav-link sidebar-item" to="/dashboard/certificados">Certificados</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link sidebar-item" to="/dashboard/proyectos">
-              Proyectos
-            </Link>
+            <Link className="nav-link sidebar-item" to="/dashboard/proyectos">Proyectos</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link sidebar-item" to="/dashboard/reservas">
-              Reservas
-            </Link>
+            <Link className="nav-link sidebar-item" to="/dashboard/actividades">Actividades</Link>
           </li>
           <li className="nav-item">
-            <Link className="nav-link sidebar-item" to="/dashboard/noticias">
-              Noticias
-            </Link>
+            <Link className="nav-link sidebar-item" to="/dashboard/reservas">Reservas</Link>
           </li>
           <li className="nav-item">
-            <Link
-              className="nav-link sidebar-item"
-              to="/dashboard/notificaciones"
-            >
-              Notificaciones
-            </Link>
+            <Link className="nav-link sidebar-item" to="/dashboard/noticias">Noticias</Link>
+          </li>
+          <li className="nav-item">
+            <Link className="nav-link sidebar-item" to="/dashboard/notificaciones">Notificaciones</Link>
           </li>
         </ul>
 
@@ -192,18 +182,15 @@ function Dashboard() {
                         </Col>
                       </Row>
                       <div className="alert alert-info">
-                        Usa el menú lateral para gestionar usuarios, noticias,
-                        proyectos o reservas.
+                        Usa el menú lateral para gestionar usuarios, noticias, proyectos o reservas.
                       </div>
                     </div>
                   }
                 />
                 <Route path="vecinos" element={<Vecinos />} />
-                <Route
-                  path="certificados"
-                  element={<CertificadosDashboard />}
-                />
+                <Route path="certificados" element={<CertificadosDashboard />} />
                 <Route path="proyectos" element={<Proyectos />} />
+                <Route path="actividades" element={<Actividades />} /> 
                 <Route path="reservas" element={<Reservas />} />
                 <Route path="noticias" element={<Noticias />} />
                 <Route path="notificaciones" element={<Notificaciones />} />
@@ -231,13 +218,7 @@ function Dashboard() {
           <Button variant="secondary" onClick={() => setShowLogout(false)}>
             Cancelar
           </Button>
-          <Button
-            variant="primary"
-            onClick={() => {
-              logout(); // Limpia el usuario del contexto y localStorage
-              navigate("/"); // Redirige al inicio
-            }}
-          >
+          <Button variant="primary" href="/">
             Salir
           </Button>
         </Modal.Footer>

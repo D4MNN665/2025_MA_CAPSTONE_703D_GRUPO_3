@@ -2,15 +2,15 @@ import React, { useEffect, useState } from "react";
 import api from "../../../api";
 import { useAuth } from "../../../context/auth";
 
-function Proyectos() {
+function Actividades() {
   const { user } = useAuth();
-  const [proyectos, setProyectos] = useState([]);
+  const [actividades, setActividades] = useState([]);
   const [mensaje, setMensaje] = useState("");
   const [showModal, setShowModal] = useState(false);
   const [razonRechazo, setRazonRechazo] = useState("");
-  const [proyectoRechazo, setProyectoRechazo] = useState(null);
+  const [actividadRechazo, setActividadRechazo] = useState(null);
 
-  const fetchProyectos = () => {
+  const fetchActividades = () => {
     (async () => {
       try {
         let id_uv = user?.id_uv ?? null;
@@ -19,41 +19,39 @@ function Proyectos() {
           id_uv = s ? Number(s) : null;
         }
         if (!id_uv) {
-          setProyectos([]);
+          setActividades([]);
           return;
         }
         const token = localStorage.getItem("access_token");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-        const res = await api.get(`/proyectos/uv/${id_uv}`, { headers });
-        setProyectos(Array.isArray(res.data) ? res.data : []);
+        const res = await api.get(`/actividades/uv/${id_uv}`, { headers });
+        setActividades(Array.isArray(res.data) ? res.data : []);
       } catch (e) {
-        console.error("GET /proyectos/uv", e?.response?.data || e);
-        setMensaje("Error al cargar proyectos");
-        setProyectos([]);
+        console.error("GET /actividades/uv", e?.response?.data || e);
+        setMensaje("Error al cargar actividades");
+        setActividades([]);
       }
     })();
   };
 
   useEffect(() => {
-    fetchProyectos();
+    fetchActividades();
   }, []);
 
-  const actualizarEstado = (id_proyecto, nuevoEstado, razon = "") => {
-    api.put(`/proyectos/${id_proyecto}/estado`, { estado: nuevoEstado, razon })
+  const actualizarEstado = (id_actividad, nuevoEstado, razon = "") => {
+    api.put(`/actividades/${id_actividad}/estado`, { estado: nuevoEstado, razon })
       .then((res) => {
-        console.log("Respuesta backend:", res.data || res);
-        setMensaje(`Proyecto ${nuevoEstado === "aprobado" ? "aprobado" : "rechazado"} correctamente.`);
-        fetchProyectos();
+        setMensaje(`Actividad ${nuevoEstado === "aprobado" ? "aprobada" : "rechazada"} correctamente.`);
+        fetchActividades();
       })
       .catch((err) => {
-        setMensaje("Error al actualizar el estado del proyecto.");
+        setMensaje("Error al actualizar el estado de la actividad.");
         console.error("Error backend:", err.response?.data || err);
       });
   };
 
-  // Maneja el rechazo abriendo el modal
-  const handleRechazar = (proy) => {
-    setProyectoRechazo(proy);
+  const handleRechazar = (act) => {
+    setActividadRechazo(act);
     setShowModal(true);
   };
 
@@ -62,57 +60,59 @@ function Proyectos() {
       alert("Por favor ingrese una razón.");
       return;
     }
-    actualizarEstado(proyectoRechazo.id_proyecto, "rechazado", razonRechazo);
+    actualizarEstado(actividadRechazo.id_actividad, "rechazado", razonRechazo);
     setShowModal(false);
     setRazonRechazo("");
-    setProyectoRechazo(null);
+    setActividadRechazo(null);
   };
 
   return (
     <div className="container mt-4">
-      <h2>Gestión de Proyectos Vecinales</h2>
+      <h2>Gestión de Actividades</h2>
       {mensaje && <div className="alert alert-info">{mensaje}</div>}
       <table className="table table-bordered mt-3">
         <thead>
           <tr>
             <th>ID</th>
             <th>Nombre</th>
-            <th>Estado</th>
+              {/* <th>Estado</th> */}
             <th>Descripción</th>
-            <th>Tipo</th>
-            <th>Ubicación</th>
+            <th>Fecha</th>
+            <th>Lugar</th>
             <th>Acciones</th>
           </tr>
         </thead>
         <tbody>
-          {proyectos.map(p => (
-            <tr key={p.id_proyecto}>
-              <td>{p.id_proyecto}</td>
-              <td>{p.titulo}</td>
-              <td>{p.estado}</td>
-              <td>{p.descripcion}</td>
-              <td>{p.tipo_proyecto}</td>
-              <td>{p.ubicacion}</td>
+          {actividades.map(a => (
+            <tr key={a.id_actividad}>
+              <td>{a.id_actividad}</td>
+              <td>{a.titulo}</td>
+                {/* <td>{a.estado}</td> */}
+              <td>{a.descripcion}</td>
+              <td>{a.fecha_inicio ? a.fecha_inicio : "-"}</td>
+              <td>{a.lugar || "-"}</td>
               <td>
-                {p.estado === "pendiente" && (
-                  <>
-                    <button
-                      className="btn btn-success btn-sm me-2"
-                      onClick={() => actualizarEstado(p.id_proyecto, "aprobado")}
-                    >
-                      Aprobar
-                    </button>
-                    <button
-                      className="btn btn-danger btn-sm"
-                      onClick={() => handleRechazar(p)}
-                    >
-                      Rechazar
-                    </button>
-                  </>
-                )}
-                {p.estado !== "pendiente" && (
-                  <span className="text-muted">Sin acciones</span>
-                )}
+                  {/*
+                  {a.estado === "pendiente" && (
+                    <>
+                      <button
+                        className="btn btn-success btn-sm me-2"
+                        onClick={() => actualizarEstado(a.id_actividad, "aprobado")}
+                      >
+                        Aprobar
+                      </button>
+                      <button
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleRechazar(a)}
+                      >
+                        Rechazar
+                      </button>
+                    </>
+                  )}
+                  {a.estado !== "pendiente" && (
+                    <span className="text-muted">Sin acciones</span>
+                  )}
+                  */}
               </td>
             </tr>
           ))}
@@ -156,4 +156,4 @@ function Proyectos() {
   );
 }
 
-export default Proyectos;
+export default Actividades;

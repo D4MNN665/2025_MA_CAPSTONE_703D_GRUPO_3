@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../../api";
 import { useAuth } from "../../../context/auth"; // Ajusta la ruta si tu contexto está en otro lugar
 
 function Noticias() {
-  const { user } = useAuth(); // user.id es el ID del usuario logueado
+  const { user } = useAuth(); // user contains id_uv in our flow
   const [noticias, setNoticias] = useState([]);
   const [titulo, setTitulo] = useState("");
   const [contenido, setContenido] = useState("");
@@ -15,9 +15,26 @@ function Noticias() {
   }, []);
 
   const fetchNoticias = () => {
-    axios.get("http://localhost:8000/noticias")
-      .then(res => setNoticias(res.data))
-      .catch(err => console.error(err));
+    (async () => {
+      try {
+        let id_uv = user?.id_uv ?? null;
+        if (!id_uv) {
+          const s = localStorage.getItem("id_uv");
+          id_uv = s ? Number(s) : null;
+        }
+        if (!id_uv) {
+          setNoticias([]);
+          return;
+        }
+        const token = localStorage.getItem("access_token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await api.get(`/noticias/uv/${id_uv}`, { headers });
+        setNoticias(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.error("GET /noticias/uv", err?.response?.data || err);
+        setNoticias([]);
+      }
+    })();
   };
 
   const handleCrear = (e) => {
@@ -31,18 +48,23 @@ function Noticias() {
       autor_id: autorId
     };
 
-    axios.post("http://localhost:8000/noticias", noticia)
+    // attach optional id_uv fallback and debug
+    const id_uv_local = localStorage.getItem('id_uv') || user?.id_uv;
+    if (id_uv_local) noticia.id_uv = Number(id_uv_local);
+    console.log('[NOTICIAS] token?', !!localStorage.getItem('access_token'), 'id_uv_local', id_uv_local);
+
+    api.post("/noticias", noticia)
       .then(() => {
         setTitulo("");
         setContenido("");
         fetchNoticias();
       })
-      .catch(err => alert("Error al crear noticia: " + err.response?.data?.detail));
+      .catch(err => alert("Error al crear noticia: " + (err.response?.data?.detail || "")));
   };
 
   const handleDelete = (id) => {
     if (window.confirm("¿Seguro que deseas eliminar esta noticia?")) {
-      axios.delete(`http://localhost:8000/noticias/${id}`)
+      api.delete(`/noticias/${id}`)
         .then(() => fetchNoticias())
         .catch(err => alert("Error al eliminar noticia"));
     }
@@ -66,7 +88,7 @@ function Noticias() {
       autor_id: autorId
     };
 
-    axios.put(`http://localhost:8000/noticias/${editId}`, noticia)
+    api.put(`/noticias/${editId}`, noticia)
       .then(() => {
         setEditId(null);
         setTitulo("");

@@ -1,12 +1,17 @@
-from fastapi import APIRouter, HTTPException, BackgroundTasks
+from fastapi import APIRouter, HTTPException, BackgroundTasks, Depends, Header, Body
+from pydantic import ValidationError
 from pydantic import BaseModel
 from models.models import CertificadoResidencia
 from conexion import conectar_db
+from jwt.deps import get_admin_uv
+from jwt.jwt_utils import verificar_access_token
+from .utils import list_by_uv
 
 from fpdf import FPDF
 from email.message import EmailMessage
 import smtplib
 import re
+import traceback
 
 router = APIRouter()
 
@@ -19,8 +24,41 @@ EMAIL_USER = os.getenv("EMAIL_USER")
 EMAIL_PASS = os.getenv("EMAIL_PASS")
 
 @router.post("/certificados/residencia",tags=["CRUD Certificados"])
-def emitir_certificado(certificado: CertificadoResidencia):
+def emitir_certificado(
+    payload: dict = Body(...),
+    id_uv: int | None = Depends(get_admin_uv),
+    authorization: str | None = Header(None),
+):
+    # payload: expected to contain the certificado fields and optionally id_uv
+    id_uv_body = payload.get("id_uv")
+    try:
+        certificado = CertificadoResidencia.model_validate({k: v for k, v in payload.items() if k != "id_uv"})
+    except ValidationError as ve:
+        # return similar structure as earlier UI error
+        errores = [err.get('msg') or str(err) for err in ve.errors()]
+        raise HTTPException(status_code=422, detail={"mensaje": "Datos inválidos en la solicitud", "errores": errores})
+
     print("ID VECINO RECIBIDO:", certificado.id_vecino)
+    # Debug: print authorization header and token payload to diagnose why id_uv may be None
+    try:
+        print("[DEBUG] Authorization header:", authorization)
+        if authorization and authorization.startswith("Bearer "):
+            token = authorization.split(" ", 1)[1]
+            try:
+                token_payload = verificar_access_token(token)
+                print("[DEBUG] verificar_access_token payload:", token_payload)
+            except Exception as _e:
+                print("[DEBUG] verificar_access_token raised:", _e)
+        else:
+            print("[DEBUG] No bearer token in authorization header")
+    except Exception:
+        pass
+
+    # Prefer id_uv from token (id_uv). If missing, allow id_uv_body (from client) as fallback.
+    effective_id_uv = id_uv or id_uv_body
+    if effective_id_uv is None:
+        # neither token nor body provided id_uv -> unauthorized for UV-scoped creation
+        raise HTTPException(status_code=401, detail="No se pudo derivar id_uv del token")
     try:
         conn = conectar_db()
         cursor = conn.cursor(dictionary=True)
@@ -35,24 +73,56 @@ def emitir_certificado(certificado: CertificadoResidencia):
         if not vecino:
             raise HTTPException(status_code=404, detail="Vecino no encontrado")
 
-        cursor.execute(
-            "INSERT INTO certificados (rut, nombreVecino, nacionalidad, domicilio, tipo_residencia, motivo, id_vecino) VALUES (%s, %s, %s, %s, %s, %s, %s)",
-            (certificado.rut, certificado.nombreVecino, certificado.nacionalidad, certificado.domicilio, certificado.tipo_residencia, certificado.motivo, certificado.id_vecino)
-        )
+    # Comprueba si la columna id_uv existe en la tabla certificados; si no, hace un INSERT sin ella
+        try:
+            cursor.execute(
+                "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s AND COLUMN_NAME = 'id_uv'",
+                ("certificados",)
+            )
+            has_id_uv = cursor.fetchone() is not None
+        except Exception:
+            # En caso de error en la comprobación, asumir que la columna no existe para evitar romper
+            has_id_uv = False
+
+        # Debug: mostrar el id_uv efectivo y si la tabla tiene la columna
+        print(f"[DEBUG] effective_id_uv={effective_id_uv} has_id_uv={has_id_uv}")
+        if has_id_uv:
+            # Si la tabla espera id_uv pero no tenemos valor efectivo, error
+            if effective_id_uv is None:
+                raise HTTPException(status_code=401, detail="No se pudo derivar id_uv del token")
+            cursor.execute(
+                "INSERT INTO certificados (rut, nombreVecino, nacionalidad, domicilio, tipo_residencia, motivo, id_vecino, id_uv) VALUES (%s, %s, %s, %s, %s, %s, %s, %s)",
+                (certificado.rut, certificado.nombreVecino, certificado.nacionalidad, certificado.domicilio, certificado.tipo_residencia, certificado.motivo, certificado.id_vecino, effective_id_uv)
+            )
+        else:
+            cursor.execute(
+                "INSERT INTO certificados (rut, nombreVecino, nacionalidad, domicilio, tipo_residencia, motivo, id_vecino) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (certificado.rut, certificado.nombreVecino, certificado.nacionalidad, certificado.domicilio, certificado.tipo_residencia, certificado.motivo, certificado.id_vecino)
+            )
         conn.commit()
         return {"mensaje": "Certificado de residencia emitido con éxito"}
     except HTTPException:
         raise
     except Exception as e:
         print("Error al emitir certificado:", e)
-        if conn:
-            conn.rollback()
+        traceback.print_exc()
+        try:
+            if 'conn' in locals() and conn:
+                conn.rollback()
+        except Exception:
+            pass
         raise HTTPException(status_code=500, detail=str(e))
     finally:
-        if cursor:
-            cursor.close()
-        if conn:
-            conn.close()    
+        try:
+            if 'cursor' in locals() and cursor:
+                cursor.close()
+        except Exception:
+            pass
+        try:
+            if 'conn' in locals() and conn:
+                conn.close()
+        except Exception:
+            pass
    
 @router.get("/certificados/residencia/{rut}",tags=["CRUD Certificados"])
 def obtener_certificado(rut: str):
@@ -70,14 +140,36 @@ def obtener_certificado(rut: str):
     return certificado
 
 @router.get("/certificados/residencia",tags=["CRUD Certificados"])
-def listar_certificados():
+def listar_certificados(id_uv: int | None = Depends(get_admin_uv)):
+    """Lista certificados. Si el token no permite derivar id_uv devuelve lista vacía.
+    Si id_uv está presente, filtra por la UV correspondiente (mediante join con vecinos si es necesario).
+    """
+    # Use central helper
     conn = conectar_db()
     cursor = conn.cursor(dictionary=True)
-    cursor.execute("SELECT * FROM certificados ORDER BY fecha_solicitud DESC")
-    certificados = cursor.fetchall()
-    cursor.close()
-    conn.close()
-    return certificados
+    try:
+        certificados = list_by_uv(cursor, 'certificados', id_uv, join_table='vecinos', join_on='t.id_vecino = j.id_vecino', order_by='fecha_solicitud DESC')
+        return certificados
+    finally:
+        try: cursor.close()
+        except: pass
+        try: conn.close()
+        except: pass
+
+
+@router.get("/certificados/uv/{id_uv}", tags=["CRUD Certificados"])
+def listar_certificados_por_uv(id_uv: int):
+    """Listado de certificados filtrado por id_uv (recibe id_uv en el path)."""
+    conn = conectar_db()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        rows = list_by_uv(cursor, 'certificados', id_uv, join_table='vecinos', join_on='t.id_vecino = j.id_vecino', order_by='fecha_solicitud DESC')
+        return rows
+    finally:
+        try: cursor.close()
+        except: pass
+        try: conn.close()
+        except: pass
 
 class EstadoCertificado(BaseModel):
     estado: str

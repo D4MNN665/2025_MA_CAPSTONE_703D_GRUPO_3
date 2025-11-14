@@ -1,7 +1,10 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends, Body, Header
+from pydantic import ValidationError
 from typing import List
 from models.models import Proyecto, ProyectoCrear
 from conexion import conectar_db
+from jwt.deps import get_admin_uv
+from .utils import list_by_uv
 
 from fastapi import BackgroundTasks
 from email.message import EmailMessage
@@ -19,7 +22,25 @@ from datetime import datetime
 router = APIRouter(prefix="/proyectos", tags=["CRUD Proyectos"])
 
 @router.post("/", response_model=Proyecto)
-def crear_proyecto(proyecto: ProyectoCrear):
+def crear_proyecto(payload: dict = Body(...), id_uv: int | None = Depends(get_admin_uv), authorization: str | None = Header(None)):
+    id_uv_body = payload.get("id_uv")
+    print(id_uv_body)
+    try:
+        proyecto = ProyectoCrear.model_validate({k: v for k, v in payload.items() if k != "id_uv"})
+    except ValidationError as ve:
+        errores = [err.get('msg') or str(err) for err in ve.errors()]
+        raise HTTPException(status_code=422, detail={"mensaje": "Datos inválidos en la solicitud", "errores": errores})
+
+    # Debug
+    try:
+        print("[DEBUG] Authorization header (proyectos):", authorization)
+    except Exception:
+        pass
+
+    effective_id_uv = id_uv or id_uv_body
+    if effective_id_uv is None:
+        raise HTTPException(status_code=401, detail="No se pudo derivar id_uv del token")
+
     conn = conectar_db()
     cursor = conn.cursor(dictionary=True)
 
@@ -30,19 +51,46 @@ def crear_proyecto(proyecto: ProyectoCrear):
         conn.close()
         raise HTTPException(status_code=400, detail="El vecino asociado no existe")
 
-    query = """
-    INSERT INTO proyectos (id_vecino, titulo, descripcion, fecha_postulacion, estado, tipo_proyecto, ubicacion)
-    VALUES (%s, %s, %s, %s, %s, %s, %s)
-    """
-    values = (
-        proyecto.id_vecino,
-        proyecto.titulo,
-        proyecto.descripcion,
-        proyecto.fecha_postulacion,
-        proyecto.estado,
-        proyecto.tipo_proyecto,
-        proyecto.ubicacion,
-    )
+    # Comprobar si la tabla proyectos tiene columna id_uv
+    try:
+        cursor.execute(
+            "SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = %s AND COLUMN_NAME = 'id_uv'",
+            ("proyectos",)
+        )
+        has_id_uv = cursor.fetchone() is not None
+    except Exception:
+        has_id_uv = False
+
+    if has_id_uv:
+        query = """
+        INSERT INTO proyectos (id_vecino, titulo, descripcion, fecha_postulacion, estado, tipo_proyecto, ubicacion, id_uv)
+        VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        values = (
+            proyecto.id_vecino,
+            proyecto.titulo,
+            proyecto.descripcion,
+            proyecto.fecha_postulacion,
+            proyecto.estado,
+            proyecto.tipo_proyecto,
+            proyecto.ubicacion,
+            effective_id_uv,
+        )
+    else:
+        query = """
+        INSERT INTO proyectos (id_vecino, titulo, descripcion, fecha_postulacion, estado, tipo_proyecto, ubicacion)
+        VALUES (%s, %s, %s, %s, %s, %s, %s)
+        """
+        values = (
+            proyecto.id_vecino,
+            proyecto.titulo,
+            proyecto.descripcion,
+            proyecto.fecha_postulacion,
+            proyecto.estado,
+            proyecto.tipo_proyecto,
+            proyecto.ubicacion,
+        )
+
     cursor.execute(query, values)
     conn.commit()
 
@@ -63,12 +111,19 @@ def crear_proyecto(proyecto: ProyectoCrear):
     return proyecto_creado
 
 @router.get("/", response_model=List[Proyecto])
-def listar_proyectos():
+def listar_proyectos(id_uv: int | None = Depends(get_admin_uv)):
+    if id_uv is None:
+        return []
     conn = conectar_db()
     cursor = conn.cursor(dictionary=True)
-
-    cursor.execute("SELECT * FROM proyectos ORDER BY fecha_postulacion DESC")
-    result = cursor.fetchall()
+    try:
+        result = list_by_uv(cursor, 'proyectos', id_uv, join_table='vecinos', join_on='t.id_vecino = j.id_vecino', order_by='fecha_postulacion DESC')
+        return result
+    finally:
+        try: cursor.close()
+        except: pass
+        try: conn.close()
+        except: pass
 
     # Convertir fecha_postulacion a string si es datetime
     for proyecto in result:
@@ -81,6 +136,28 @@ def listar_proyectos():
     cursor.close()
     conn.close()
     return result
+
+
+@router.get("/uv/{id_uv}")
+def listar_proyectos_por_uv(id_uv: int):
+    """Listado de proyectos filtrado por id_uv (recibe id_uv en el path)."""
+    conn = conectar_db()
+    cursor = conn.cursor(dictionary=True)
+    try:
+        rows = list_by_uv(cursor, 'proyectos', id_uv, join_table='vecinos', join_on='t.id_vecino = j.id_vecino', order_by='fecha_postulacion DESC')
+        # formatear fechas si es necesario
+        from datetime import datetime as _dt
+        for p in rows:
+            if isinstance(p.get('fecha_postulacion'), (_dt,)):
+                p['fecha_postulacion'] = p['fecha_postulacion'].strftime('%Y-%m-%d')
+            if 'fecha_resolucion' in p and isinstance(p.get('fecha_resolucion'), (_dt,)):
+                p['fecha_resolucion'] = p['fecha_resolucion'].strftime('%Y-%m-%d')
+        return rows
+    finally:
+        try: cursor.close()
+        except: pass
+        try: conn.close()
+        except: pass
 
 @router.get("/{proyecto_id}", response_model=Proyecto)
 def obtener_proyecto(proyecto_id: int):

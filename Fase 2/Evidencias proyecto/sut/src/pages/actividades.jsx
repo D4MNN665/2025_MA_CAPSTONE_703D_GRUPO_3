@@ -33,6 +33,7 @@ const Actividades = () => {
       return;
     }
     try {
+      const id_uv_local = localStorage.getItem("id_uv");
       const actividad = {
         titulo: nuevaActividad.titulo,
         descripcion: nuevaActividad.descripcion,
@@ -42,6 +43,7 @@ const Actividades = () => {
         cupo_actual: 1,
         id_usuario: user.id_usuario,
       };
+      if (id_uv_local) actividad.id_uv = Number(id_uv_local);
       await axios.post(`${API_BASE}/actividades`, actividad);
       await cargarActividades();
       setNuevaActividad({ titulo: "", descripcion: "" });
@@ -70,7 +72,7 @@ const Actividades = () => {
 
   if (!user?.id_usuario) {
     return (
-      <div className="container-fluid min-vh-100" style={{ background: "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)" }}>
+      <div className="container-fluid min-vh-100 page-gradient-brand">
         <div className="container mt-4">
           <div className="alert alert-warning">
             Debes estar logueado para crear o enrolarte en actividades.
@@ -81,11 +83,11 @@ const Actividades = () => {
   }
 
   return (
-    <div className="container-fluid min-vh-100" style={{ background: "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)" }}>
+    <div className="container-fluid min-vh-100 page-gradient-brand">
       <div className="container p-0">
         <div className="text-center mb-4">
-          <h1 className="display-5 fw-bold text-primary">Gestión de Actividades</h1>
-          <p className="lead">Crea y participa en actividades de tu comunidad</p>
+          <h1 className="display-5 fw-bold on-brand-title">Gestión de Actividades</h1>
+          <p className="lead on-brand-subtitle">Crea y participa en actividades de tu comunidad</p>
         </div>
         <div className="row">
           <div className="col-lg-5 mb-4">
@@ -133,7 +135,7 @@ const Actividades = () => {
             </form>
           </div>
           <div className="col-lg-7">
-            <h2 className="mb-4 text-primary">Actividades</h2>
+            <h2 className="mb-4 on-brand-title">Actividades</h2>
             {actividades.length === 0 ? (
               <div className="alert alert-info">No hay actividades disponibles.</div>
             ) : (

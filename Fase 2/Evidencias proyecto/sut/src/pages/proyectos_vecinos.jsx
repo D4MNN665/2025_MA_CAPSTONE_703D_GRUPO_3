@@ -40,9 +40,19 @@ const ProyectosVecinosForm = () => {
       ubicacion: form.ubicacion,
     };
     try {
+      // attach token header and optional id_uv fallback (from localStorage or user)
+      const token = localStorage.getItem('access_token');
+      const headers = { 'Content-Type': 'application/json' };
+      if (token) headers.Authorization = `Bearer ${token}`;
+      const id_uv_local = localStorage.getItem('id_uv') || user.id_uv;
+      if (id_uv_local) {
+        data.id_uv = Number(id_uv_local);
+      }
+      console.log('[PROYECTOS] token?', !!token, 'id_uv_local', id_uv_local);
+
       const res = await fetch("http://localhost:8000/proyectos/", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify(data),
       });
       if (res.ok) {
@@ -62,12 +72,12 @@ const ProyectosVecinosForm = () => {
     }
   };
 
-  return (
-    <div className="container-fluid min-vh-100 p-0" style={{ background: "linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%)" }}>
+ return (
+   <div className="container-fluid min-vh-100 p-0 page-gradient-brand">
       <div className="container p-0">
         <div className="text-center mb-4">
-          <h1 className="display-5 fw-bold text-primary">Postulación de Proyecto</h1>
-          <p className="lead">Propón proyectos para mejorar tu comunidad</p>
+          <h1 className="display-5 fw-bold on-brand-title">Postulación de Proyecto</h1>
+          <p className="lead on-brand-subtitle">Propón proyectos para mejorar tu comunidad</p>
         </div>
         <div className="row justify-content-center">
           <div className="col-lg-6">

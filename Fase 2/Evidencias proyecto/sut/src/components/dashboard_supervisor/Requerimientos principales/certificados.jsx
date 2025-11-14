@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from "react";
+import api from "../../../api";
+import { useAuth } from "../../../context/auth";
 
 const CertificadosDashboard = () => {
+  const { user } = useAuth();
   const [certificados, setCertificados] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
@@ -8,49 +11,51 @@ const CertificadosDashboard = () => {
   const [certificadoRechazo, setCertificadoRechazo] = useState(null);
 
   useEffect(() => {
-    fetch("http://localhost:8000/certificados/residencia")
-      .then((res) => res.json())
-      .then((data) => {
-        setCertificados(data);
+    const load = async () => {
+      try {
+        let id_uv = user?.id_uv ?? null;
+        if (!id_uv) {
+          const s = localStorage.getItem("id_uv");
+          id_uv = s ? Number(s) : null;
+        }
+        if (!id_uv) {
+          setCertificados([]);
+          return;
+        }
+        const token = localStorage.getItem("access_token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const { data } = await api.get(`/certificados/uv/${id_uv}`, { headers });
+        setCertificados(Array.isArray(data) ? data : []);
+      } catch (e) {
+        console.error("GET /certificados/uv", e?.response?.data || e);
+        setCertificados([]);
+      } finally {
         setLoading(false);
-      })
-      .catch(() => setLoading(false));
+      }
+    };
+    load();
   }, []);
 
   // Función para actualizar el estado del certificado
   const actualizarEstado = (id_certificado, nuevoEstado, razon = "") => {
-    const token = localStorage.getItem("access_token");
-    fetch(`http://localhost:8000/certificados/residencia/${id_certificado}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
-      body: JSON.stringify({ estado: nuevoEstado, razon }),
-    }).then((res) => {
-      if (res.ok) {
+    api
+      .put(`/certificados/residencia/${id_certificado}`, { estado: nuevoEstado, razon })
+      .then(() => {
         setCertificados((prev) =>
           prev.map((cert) =>
-            cert.id_certificado === id_certificado
-              ? { ...cert, estado: nuevoEstado }
-              : cert
+            cert.id_certificado === id_certificado ? { ...cert, estado: nuevoEstado } : cert
           )
         );
-      }
-    });
+      })
+      .catch((e) => console.error("PUT /certificados/residencia", e?.response?.data || e));
   };
 
   const enviarPDF = (cert) => {
-    const token = localStorage.getItem("access_token");
-    fetch(
-      `http://localhost:8000/certificados/enviar_pdf/${cert.id_certificado}`,
-      {
-        method: "POST",
-        headers: { Authorization: `Bearer ${token}` },
-      }
-    )
-      .then((res) => res.json())
-      .then((data) => {
-        alert(data.mensaje || "PDF enviado correctamente");
-      })
-      .catch(() => {
+    api
+      .post(`/certificados/enviar_pdf/${cert.id_certificado}`)
+      .then(({ data }) => alert(data?.mensaje || "PDF enviado correctamente"))
+      .catch((e) => {
+        console.error("POST /certificados/enviar_pdf", e?.response?.data || e);
         alert("Error al enviar el PDF");
       });
   };
@@ -93,7 +98,7 @@ const CertificadosDashboard = () => {
             </tr>
           </thead>
           <tbody>
-            {certificados.map((cert) => (
+            {Array.isArray(certificados) && certificados.map((cert) => (
               <tr key={cert.id_certificado}>
                 <td>{cert.id_certificado}</td>
                 <td>{cert.fecha_solicitud}</td>

@@ -1,20 +1,45 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { useAuth } from "../../../context/auth";
 
 function Vecinos() {
   const [vecinos, setVecinos] = useState([]);
   const [editId, setEditId] = useState(null);
   const [editData, setEditData] = useState({});
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchVecinos();
   }, []);
 
   const fetchVecinos = () => {
-    axios
-      .get("http://localhost:8000/vecinos")
-      .then((res) => setVecinos(res.data))
-      .catch((err) => console.error(err));
+    (async () => {
+      try {
+        // obtener id_uv preferentemente desde el contexto de auth
+        // use the top-level `user` from the hook called at component top
+        let id_uv = user?.id_uv ?? null;
+
+        // fallback: si no está en el contexto, usar localStorage (guardado en login)
+        if (!id_uv) {
+          const s = localStorage.getItem("id_uv");
+          id_uv = s ? Number(s) : null;
+        }
+
+        if (!id_uv) {
+          // nada que mostrar
+          setVecinos([]);
+          return;
+        }
+
+        const token = localStorage.getItem("access_token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await axios.get(`http://localhost:8000/vecinos/uv/${id_uv}`, { headers });
+        setVecinos(res.data || []);
+      } catch (err) {
+        console.error("Error fetching vecinos by UV:", err);
+        setVecinos([]);
+      }
+    })();
   };
 
   // Contar miembros y no miembros
@@ -292,3 +317,4 @@ function Vecinos() {
   );
 }
 export default Vecinos;
+

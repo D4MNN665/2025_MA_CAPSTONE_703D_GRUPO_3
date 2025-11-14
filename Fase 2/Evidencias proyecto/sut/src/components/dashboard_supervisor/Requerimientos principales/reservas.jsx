@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
+import api from "../../../api";
+import { useAuth } from "../../../context/auth";
 
 function Reservas() {
+  const { user } = useAuth();
   const [reservas, setReservas] = useState([]);
 
   useEffect(() => {
@@ -9,28 +11,40 @@ function Reservas() {
   }, []);
 
   const fetchReservas = () => {
-    axios.get("http://localhost:8000/reservas")
-      .then(res => setReservas(res.data))
-      .catch(err => console.error(err));
+    (async () => {
+      try {
+        let id_uv = user?.id_uv ?? null;
+        if (!id_uv) {
+          const s = localStorage.getItem("id_uv");
+          id_uv = s ? Number(s) : null;
+        }
+        if (!id_uv) {
+          setReservas([]);
+          return;
+        }
+        const token = localStorage.getItem("access_token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+        const res = await api.get(`/reservas/uv/${id_uv}`, { headers });
+        setReservas(Array.isArray(res.data) ? res.data : []);
+      } catch (err) {
+        console.error("GET /reservas/uv", err?.response?.data || err);
+        setReservas([]);
+      }
+    })();
   };
 
   const actualizarEstado = (id_reserva, nuevoEstado) => {
-  const token = localStorage.getItem("access_token");
   const reserva = reservas.find(r => r.id_reserva === id_reserva);
   if (!reserva) return alert("Reserva no encontrada");
 
-  axios.put(
-    `http://localhost:8000/reservas/${id_reserva}`,
+  api.put(
+    `/reservas/${id_reserva}`,
     {
       id_vecino: reserva.id_vecino,
+      nombre_completo: reserva.nombre_completo,
       nombreSector: reserva.nombreSector,
       fecha_inicio: reserva.fecha_inicio,
       estado: nuevoEstado,
-    },
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
     }
   )
     .then(() => fetchReservas())
@@ -39,7 +53,7 @@ function Reservas() {
 
   const eliminarReserva = (id_reserva) => {
     if (window.confirm("¿Seguro que deseas eliminar esta reserva?")) {
-      axios.delete(`http://localhost:8000/reservas/${id_reserva}`)
+      api.delete(`/reservas/${id_reserva}`)
         .then(() => fetchReservas())
         .catch(err => alert("Error al eliminar la reserva"));
     }
