@@ -28,7 +28,7 @@ CREATE TABLE `usuarios_en_actividades` (
   `actividad_id` int NOT NULL,
   PRIMARY KEY (`id`),
   UNIQUE KEY `usuario_id` (`usuario_id`,`actividad_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -37,7 +37,7 @@ CREATE TABLE `usuarios_en_actividades` (
 
 LOCK TABLES `usuarios_en_actividades` WRITE;
 /*!40000 ALTER TABLE `usuarios_en_actividades` DISABLE KEYS */;
-INSERT INTO `usuarios_en_actividades` VALUES (4,6,2),(5,6,3),(3,6,9),(2,76,7),(1,76,8);
+INSERT INTO `usuarios_en_actividades` VALUES (4,6,2),(5,6,3),(6,6,4),(7,6,5),(8,6,6),(9,6,7),(10,6,8),(3,6,9),(12,6,10),(2,76,7),(1,76,8);
 /*!40000 ALTER TABLE `usuarios_en_actividades` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -50,4 +50,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-14  0:51:20
+-- Dump completed on 2025-11-14  2:05:10

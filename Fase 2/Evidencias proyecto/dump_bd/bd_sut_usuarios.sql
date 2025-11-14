@@ -27,7 +27,7 @@ CREATE TABLE `usuarios` (
   `id_vecino` int NOT NULL,
   `nombre` varchar(50) NOT NULL,
   `password_hash` varchar(255) NOT NULL,
-  `rol` enum('admin','directivo','secretario','tesorero','vecino') NOT NULL DEFAULT 'directivo',
+  `rol` enum('admin','directivo','secretario','tesorero','vecino') NOT NULL DEFAULT 'vecino',
   `rut` varchar(45) NOT NULL,
   `id_uv` int DEFAULT NULL,
   PRIMARY KEY (`id_usuario`),
@@ -47,7 +47,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,17,'sebastian','147','admin','20.722.122-8',21),(6,18,'David','123','directivo','20.820.262-6',21),(7,19,'Javier','123','admin','20.977.235-3',22);
+INSERT INTO `usuarios` VALUES (1,17,'sebastian','147','admin','20.722.122-8',21),(6,18,'David','123','vecino','20.820.262-6',21),(7,19,'Javier','123','admin','20.977.235-3',22);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -60,4 +60,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-14  0:51:21
+-- Dump completed on 2025-11-14  2:05:08

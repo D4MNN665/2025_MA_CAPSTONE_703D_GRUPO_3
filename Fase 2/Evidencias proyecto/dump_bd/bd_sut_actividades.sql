@@ -31,8 +31,9 @@ CREATE TABLE `actividades` (
   `cupo_max` int NOT NULL,
   `cupo_actual` int NOT NULL DEFAULT '0',
   `id_uv` int DEFAULT NULL,
+  `ubicacion` varchar(255) NOT NULL,
   PRIMARY KEY (`id_actividad`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +42,7 @@ CREATE TABLE `actividades` (
 
 LOCK TABLES `actividades` WRITE;
 /*!40000 ALTER TABLE `actividades` DISABLE KEYS */;
-INSERT INTO `actividades` VALUES (2,'Cicletada','Esto es una descripcion de la cicletada','2025-11-11 23:59:46','2025-11-12 00:59:46',5,2,21),(3,'Maratón','Esto es una descripcion de Maraton','2025-11-11 23:59:44','2025-11-12 00:59:44',5,2,21);
+INSERT INTO `actividades` VALUES (7,'Maratón','Ejemplo','2025-11-14 04:43:28','2025-11-14 05:43:28',5,2,21,'Avenida Nueva San Martín, Barrio Pehuén, Maipú, Provincia de Santiago, Región Metropolitana de Santiago, 9253341, Chile');
 /*!40000 ALTER TABLE `actividades` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +55,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-14  0:51:19
+-- Dump completed on 2025-11-14  2:05:09

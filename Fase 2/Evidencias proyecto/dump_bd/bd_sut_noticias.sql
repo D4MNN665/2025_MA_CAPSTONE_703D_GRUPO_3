@@ -41,7 +41,7 @@ CREATE TABLE `noticias` (
 
 LOCK TABLES `noticias` WRITE;
 /*!40000 ALTER TABLE `noticias` DISABLE KEYS */;
-INSERT INTO `noticias` VALUES (3,'Esto es una Noticia de prueba desde la bd','Hola','2025-08-26 19:24:17',1,22),(4,'Esto es otra noticia de prueba desde la bd ','Hola 2','2025-08-26 19:24:17',1,21),(6,'Prueba de noticiaa','sdassdasda','2025-11-14 03:36:52',1,21);
+INSERT INTO `noticias` VALUES (3,'Esto es una Noticia de prueba desde la bd','Hola','2025-08-26 19:24:17',1,22),(4,'Esto es otra noticia de prueba desde la bd ','Hola 2','2025-08-26 19:24:17',1,21),(6,'Prueba de noticiaa','Test','2025-11-14 03:36:52',1,21);
 /*!40000 ALTER TABLE `noticias` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-14  0:51:20
+-- Dump completed on 2025-11-14  2:05:10
