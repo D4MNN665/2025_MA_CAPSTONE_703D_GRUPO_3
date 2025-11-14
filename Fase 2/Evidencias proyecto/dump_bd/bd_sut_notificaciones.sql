@@ -29,6 +29,7 @@ CREATE TABLE `notificaciones` (
   `tipo` enum('afiche','email','whatsapp') NOT NULL,
   `fecha_envio` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `destinatario_id` int DEFAULT NULL,
+  `id_uv` int DEFAULT NULL,
   PRIMARY KEY (`id_notificacion`),
   KEY `fk_notif_vecino_idx` (`destinatario_id`),
   CONSTRAINT `fk_notif_vecino` FOREIGN KEY (`destinatario_id`) REFERENCES `vecinos` (`id_vecino`) ON DELETE SET NULL ON UPDATE CASCADE
@@ -53,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-06 20:24:15
+-- Dump completed on 2025-11-14  0:51:20

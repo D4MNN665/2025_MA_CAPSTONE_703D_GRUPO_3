@@ -30,9 +30,9 @@ CREATE TABLE `actividades` (
   `fecha_fin` datetime NOT NULL,
   `cupo_max` int NOT NULL,
   `cupo_actual` int NOT NULL DEFAULT '0',
-  `id_usuario` int NOT NULL,
+  `id_uv` int DEFAULT NULL,
   PRIMARY KEY (`id_actividad`)
-) ENGINE=InnoDB AUTO_INCREMENT=11 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -41,7 +41,7 @@ CREATE TABLE `actividades` (
 
 LOCK TABLES `actividades` WRITE;
 /*!40000 ALTER TABLE `actividades` DISABLE KEYS */;
-INSERT INTO `actividades` VALUES (9,'Actividad en el parque ',':(','2025-11-04 03:24:06','2025-11-04 04:24:06',5,2,76),(10,'asdasd','asdasddsa','2025-11-05 22:43:04','2025-11-05 23:43:04',5,1,6);
+INSERT INTO `actividades` VALUES (2,'Cicletada','Esto es una descripcion de la cicletada','2025-11-11 23:59:46','2025-11-12 00:59:46',5,2,21),(3,'Maratón','Esto es una descripcion de Maraton','2025-11-11 23:59:44','2025-11-12 00:59:44',5,2,21);
 /*!40000 ALTER TABLE `actividades` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -54,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-06 20:24:16
+-- Dump completed on 2025-11-14  0:51:19

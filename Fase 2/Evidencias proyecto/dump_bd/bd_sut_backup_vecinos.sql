@@ -16,38 +16,35 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `proyectos`
+-- Table structure for table `backup_vecinos`
 --
 
-DROP TABLE IF EXISTS `proyectos`;
+DROP TABLE IF EXISTS `backup_vecinos`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `proyectos` (
-  `id_proyecto` int NOT NULL AUTO_INCREMENT,
-  `id_vecino` int NOT NULL,
-  `titulo` varchar(100) NOT NULL,
-  `descripcion` text NOT NULL,
-  `fecha_postulacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `estado` enum('pendiente','aprobado','rechazado') NOT NULL DEFAULT 'pendiente',
-  `fecha_resolucion` datetime DEFAULT NULL,
-  `tipo_proyecto` varchar(45) DEFAULT NULL,
-  `ubicacion` varchar(45) DEFAULT NULL,
+CREATE TABLE `backup_vecinos` (
+  `id_vecino` int NOT NULL DEFAULT '0',
+  `nombre` varchar(45) NOT NULL,
+  `apellido` varchar(45) NOT NULL,
+  `rut` varchar(45) NOT NULL,
+  `correo` varchar(255) NOT NULL,
+  `numero_telefono` varchar(45) DEFAULT NULL,
+  `direccion` varchar(255) DEFAULT NULL,
+  `miembro` tinyint NOT NULL DEFAULT '0',
+  `contrasena` varchar(45) DEFAULT NULL,
   `id_uv` int DEFAULT NULL,
-  `razon_rechazo` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id_proyecto`),
-  KEY `fk_proyecto_vecino_idx` (`id_vecino`),
-  CONSTRAINT `fk_proyecto_vecino` FOREIGN KEY (`id_vecino`) REFERENCES `vecinos` (`id_vecino`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `fecha_nacimiento` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `proyectos`
+-- Dumping data for table `backup_vecinos`
 --
 
-LOCK TABLES `proyectos` WRITE;
-/*!40000 ALTER TABLE `proyectos` DISABLE KEYS */;
-INSERT INTO `proyectos` VALUES (6,18,'sdaasd','asdasd','2025-10-08 00:00:00','aprobado','2025-11-13 23:41:21','Infraestructura','adsdsa',21,NULL),(7,18,'PROYECTO REAL','wfs w','2025-11-10 00:00:00','rechazado','2025-11-13 23:27:41','Social','wfewfw',21,'a'),(8,18,'Plantar arboles','asdasd','2025-11-14 00:00:00','pendiente',NULL,'Ambiental','Clotario blest con Eladio rojas',21,NULL);
-/*!40000 ALTER TABLE `proyectos` ENABLE KEYS */;
+LOCK TABLES `backup_vecinos` WRITE;
+/*!40000 ALTER TABLE `backup_vecinos` DISABLE KEYS */;
+INSERT INTO `backup_vecinos` VALUES (17,'sebastian','palma','20.722.122-8','sebastian.palma945@gmail.com','+56951995463','Clotario blest 1712',1,'147',21,NULL),(18,'David','Correa','20.820.262-6','sebastian.palma945@gmail.com','+56900000000','Hnos Campos 261 V Arrayan 1',1,'123',21,NULL),(19,'Javier','Bravo','20.977.235-3','javierbravo2d@gmail.com','+56937483369','Av. Alfredo Silva Carvallo 2729',0,'123',22,20020302);
+/*!40000 ALTER TABLE `backup_vecinos` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

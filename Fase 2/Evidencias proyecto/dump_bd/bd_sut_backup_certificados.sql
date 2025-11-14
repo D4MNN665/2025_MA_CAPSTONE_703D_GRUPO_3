@@ -16,14 +16,14 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `certificados`
+-- Table structure for table `backup_certificados`
 --
 
-DROP TABLE IF EXISTS `certificados`;
+DROP TABLE IF EXISTS `backup_certificados`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `certificados` (
-  `id_certificado` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `backup_certificados` (
+  `id_certificado` int NOT NULL DEFAULT '0',
   `fecha_solicitud` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `estado` enum('pendiente','aprobado','rechazado') NOT NULL DEFAULT 'pendiente',
   `fecha_resolucion` datetime DEFAULT NULL,
@@ -35,21 +35,18 @@ CREATE TABLE `certificados` (
   `tipo_residencia` varchar(45) DEFAULT NULL,
   `id_vecino` int NOT NULL,
   `razon_rechazo` varchar(150) DEFAULT NULL,
-  `id_uv` int DEFAULT NULL,
-  PRIMARY KEY (`id_certificado`),
-  KEY `fk_certificado_vecino` (`id_vecino`),
-  CONSTRAINT `fk_certificado_vecino` FOREIGN KEY (`id_vecino`) REFERENCES `vecinos` (`id_vecino`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=22 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `id_uv` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `certificados`
+-- Dumping data for table `backup_certificados`
 --
 
-LOCK TABLES `certificados` WRITE;
-/*!40000 ALTER TABLE `certificados` DISABLE KEYS */;
-INSERT INTO `certificados` VALUES (14,'2025-09-29 21:16:11','aprobado',NULL,'Necesito el certificado porque....','Chileno','20.820.262-6','David Correa','Hnos Campos 261 V Arrayan 1','propietario',18,NULL,21),(17,'2025-10-03 16:21:44','aprobado',NULL,'Motivo X','Chileno','20.722.122-8','David Correa Mardones','Av san martin 1058','propietario',17,NULL,21),(18,'2025-10-06 11:28:38','rechazado',NULL,'123','Chileno','20.820.262-6','David Correa Mardones','Av san martin 1058','propietario',18,NULL,22),(19,'2025-10-06 22:04:30','rechazado',NULL,'13232123132','Chileno','20.820.262-6','David Correa Mardones','Av san martin 1058','propietario',18,'fuiste rechazado porque bla bla bla bla',22),(21,'2025-11-10 19:30:37','rechazado',NULL,'asdasdas','Chilena','20.820.262-6','Tomas','Calle real 123','propietario',18,'a',21);
-/*!40000 ALTER TABLE `certificados` ENABLE KEYS */;
+LOCK TABLES `backup_certificados` WRITE;
+/*!40000 ALTER TABLE `backup_certificados` DISABLE KEYS */;
+INSERT INTO `backup_certificados` VALUES (14,'2025-09-29 21:16:11','aprobado',NULL,'Necesito el certificado porque....','Chileno','20.820.262-6','David Correa','Hnos Campos 261 V Arrayan 1','propietario',18,NULL,NULL),(17,'2025-10-03 16:21:44','aprobado',NULL,'Motivo X','Chileno','20.722.122-8','David Correa Mardones','Av san martin 1058','propietario',17,NULL,NULL),(18,'2025-10-06 11:28:38','rechazado',NULL,'123','Chileno','20.820.262-6','David Correa Mardones','Av san martin 1058','propietario',18,NULL,NULL),(19,'2025-10-06 22:04:30','rechazado',NULL,'13232123132','Chileno','20.820.262-6','David Correa Mardones','Av san martin 1058','propietario',18,'fuiste rechazado porque bla bla bla bla',NULL);
+/*!40000 ALTER TABLE `backup_certificados` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 

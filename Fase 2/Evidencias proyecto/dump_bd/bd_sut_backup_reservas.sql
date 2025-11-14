@@ -16,38 +16,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `proyectos`
+-- Table structure for table `backup_reservas`
 --
 
-DROP TABLE IF EXISTS `proyectos`;
+DROP TABLE IF EXISTS `backup_reservas`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `proyectos` (
-  `id_proyecto` int NOT NULL AUTO_INCREMENT,
+CREATE TABLE `backup_reservas` (
+  `id_reserva` int NOT NULL DEFAULT '0',
   `id_vecino` int NOT NULL,
-  `titulo` varchar(100) NOT NULL,
-  `descripcion` text NOT NULL,
-  `fecha_postulacion` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `nombreSector` varchar(100) NOT NULL,
+  `fecha_inicio` datetime NOT NULL,
   `estado` enum('pendiente','aprobado','rechazado') NOT NULL DEFAULT 'pendiente',
-  `fecha_resolucion` datetime DEFAULT NULL,
-  `tipo_proyecto` varchar(45) DEFAULT NULL,
-  `ubicacion` varchar(45) DEFAULT NULL,
-  `id_uv` int DEFAULT NULL,
-  `razon_rechazo` varchar(45) DEFAULT NULL,
-  PRIMARY KEY (`id_proyecto`),
-  KEY `fk_proyecto_vecino_idx` (`id_vecino`),
-  CONSTRAINT `fk_proyecto_vecino` FOREIGN KEY (`id_vecino`) REFERENCES `vecinos` (`id_vecino`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  `id_uv` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `proyectos`
+-- Dumping data for table `backup_reservas`
 --
 
-LOCK TABLES `proyectos` WRITE;
-/*!40000 ALTER TABLE `proyectos` DISABLE KEYS */;
-INSERT INTO `proyectos` VALUES (6,18,'sdaasd','asdasd','2025-10-08 00:00:00','aprobado','2025-11-13 23:41:21','Infraestructura','adsdsa',21,NULL),(7,18,'PROYECTO REAL','wfs w','2025-11-10 00:00:00','rechazado','2025-11-13 23:27:41','Social','wfewfw',21,'a'),(8,18,'Plantar arboles','asdasd','2025-11-14 00:00:00','pendiente',NULL,'Ambiental','Clotario blest con Eladio rojas',21,NULL);
-/*!40000 ALTER TABLE `proyectos` ENABLE KEYS */;
+LOCK TABLES `backup_reservas` WRITE;
+/*!40000 ALTER TABLE `backup_reservas` DISABLE KEYS */;
+INSERT INTO `backup_reservas` VALUES (29,18,'Plaza Monte Palomar','2025-10-15 00:00:00','pendiente',NULL),(30,18,'Plaza de los master','2025-10-15 00:00:00','pendiente',NULL);
+/*!40000 ALTER TABLE `backup_reservas` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -59,4 +51,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-14  0:51:21
+-- Dump completed on 2025-11-14  0:51:19

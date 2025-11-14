@@ -28,6 +28,7 @@ CREATE TABLE `reservas` (
   `nombreSector` varchar(100) NOT NULL,
   `fecha_inicio` datetime NOT NULL,
   `estado` enum('pendiente','aprobado','rechazado') NOT NULL DEFAULT 'pendiente',
+  `id_uv` int DEFAULT NULL,
   PRIMARY KEY (`id_reserva`),
   KEY `fk_reserva_vecino_idx` (`id_vecino`),
   CONSTRAINT `fk_reserva_vecino` FOREIGN KEY (`id_vecino`) REFERENCES `vecinos` (`id_vecino`) ON DELETE CASCADE ON UPDATE CASCADE
@@ -40,7 +41,7 @@ CREATE TABLE `reservas` (
 
 LOCK TABLES `reservas` WRITE;
 /*!40000 ALTER TABLE `reservas` DISABLE KEYS */;
-INSERT INTO `reservas` VALUES (31,18,'Plaza La Fortuna','2025-10-17 00:00:00','aprobado');
+INSERT INTO `reservas` VALUES (31,18,'Piscina municipal de maipu','2025-12-03 00:00:00','aprobado',21),(32,18,'Prueba 1','2025-12-03 00:00:00','aprobado',21);
 /*!40000 ALTER TABLE `reservas` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -53,4 +54,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-06 20:24:15
+-- Dump completed on 2025-11-14  0:51:21

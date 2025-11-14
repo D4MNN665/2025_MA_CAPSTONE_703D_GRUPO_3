@@ -16,29 +16,30 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `usuarios_en_actividades`
+-- Table structure for table `backup_notificaciones`
 --
 
-DROP TABLE IF EXISTS `usuarios_en_actividades`;
+DROP TABLE IF EXISTS `backup_notificaciones`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `usuarios_en_actividades` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `usuario_id` int NOT NULL,
-  `actividad_id` int NOT NULL,
-  PRIMARY KEY (`id`),
-  UNIQUE KEY `usuario_id` (`usuario_id`,`actividad_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=6 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `backup_notificaciones` (
+  `id_notificacion` int NOT NULL DEFAULT '0',
+  `titulo` varchar(100) NOT NULL,
+  `mensaje` text NOT NULL,
+  `tipo` enum('afiche','email','whatsapp') NOT NULL,
+  `fecha_envio` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `destinatario_id` int DEFAULT NULL,
+  `id_uv` int DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `usuarios_en_actividades`
+-- Dumping data for table `backup_notificaciones`
 --
 
-LOCK TABLES `usuarios_en_actividades` WRITE;
-/*!40000 ALTER TABLE `usuarios_en_actividades` DISABLE KEYS */;
-INSERT INTO `usuarios_en_actividades` VALUES (4,6,2),(5,6,3),(3,6,9),(2,76,7),(1,76,8);
-/*!40000 ALTER TABLE `usuarios_en_actividades` ENABLE KEYS */;
+LOCK TABLES `backup_notificaciones` WRITE;
+/*!40000 ALTER TABLE `backup_notificaciones` DISABLE KEYS */;
+/*!40000 ALTER TABLE `backup_notificaciones` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
@@ -50,4 +51,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-14  0:51:20
+-- Dump completed on 2025-11-14  0:51:19

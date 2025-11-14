@@ -29,12 +29,16 @@ CREATE TABLE `usuarios` (
   `password_hash` varchar(255) NOT NULL,
   `rol` enum('admin','directivo','secretario','tesorero','vecino') NOT NULL DEFAULT 'directivo',
   `rut` varchar(45) NOT NULL,
+  `id_uv` int DEFAULT NULL,
   PRIMARY KEY (`id_usuario`),
+  UNIQUE KEY `nombre_UNIQUE` (`nombre`),
   KEY `fk_usuario_vecino` (`id_vecino`),
   KEY `fk_usuario_vecino_rut` (`rut`),
+  KEY `fk_usuarios_uv` (`id_uv`),
   CONSTRAINT `fk_usuario_vecino` FOREIGN KEY (`id_vecino`) REFERENCES `vecinos` (`id_vecino`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `fk_usuario_vecino_rut` FOREIGN KEY (`rut`) REFERENCES `vecinos` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=88 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+  CONSTRAINT `fk_usuario_vecino_rut` FOREIGN KEY (`rut`) REFERENCES `vecinos` (`rut`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_usuarios_uv` FOREIGN KEY (`id_uv`) REFERENCES `juntas_vecinos` (`id_uv`)
+) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -43,7 +47,7 @@ CREATE TABLE `usuarios` (
 
 LOCK TABLES `usuarios` WRITE;
 /*!40000 ALTER TABLE `usuarios` DISABLE KEYS */;
-INSERT INTO `usuarios` VALUES (1,17,'sebastian','147','admin','20.722.122-8'),(6,18,'David','123','directivo','20.820.262-6'),(76,88,'test','123','vecino','23.093.205-0'),(77,89,'test','123','vecino','10.805.915-K'),(78,90,'test','123','vecino','10.944.686-6'),(79,91,'test','123','vecino','11.285.602-1'),(80,92,'test','123','vecino','16.911.054-9'),(81,93,'test','123','vecino','21.453.264-6'),(82,94,'test','123','vecino','18.745.762-9'),(83,95,'test','123','vecino','17.161.043-5'),(84,96,'test','123','vecino','19.850.893-4'),(85,97,'test','123','vecino','20.696.979-2'),(86,98,'test','123','vecino','15.235.533-5'),(87,99,'test','123','vecino','15.003.899-5');
+INSERT INTO `usuarios` VALUES (1,17,'sebastian','147','admin','20.722.122-8',21),(6,18,'David','123','directivo','20.820.262-6',21),(7,19,'Javier','123','admin','20.977.235-3',22);
 /*!40000 ALTER TABLE `usuarios` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -56,4 +60,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-11-06 20:24:15
+-- Dump completed on 2025-11-14  0:51:21
