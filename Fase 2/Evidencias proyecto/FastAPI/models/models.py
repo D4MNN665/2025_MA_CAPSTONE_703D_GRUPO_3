@@ -1,5 +1,5 @@
 from pydantic import BaseModel, field_validator
-from typing import Optional, Literal
+from typing import Optional, Literal, List
 from datetime import datetime
 
 
@@ -44,7 +44,8 @@ class Actividad(BaseModel):
     cupo_max: int
     cupo_actual: int = 0
     razon_rechazo: Optional[str] = None  
-
+    ubicacion: Optional[str] = None
+    usuarios_enrolados: List[int] = []
 
 
 # --------------------

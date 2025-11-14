@@ -35,31 +35,35 @@ class ActividadCreate(BaseModel):
     cupo_max: int
     cupo_actual: int
     id_usuario: int
+    ubicacion: Optional[str] = None
+    usuarios_enrolados: List[int] = []
 
 @router.get("", response_model=List[Actividad])
 def obtener_actividades():
     cnx = conectar_db()
     if cnx is None:
         raise HTTPException(status_code=500, detail="Error al conectar a la base de datos")
-    
+
     cursor = cnx.cursor(dictionary=True)
-    query = "SELECT id_actividad, titulo, descripcion, fecha_inicio, fecha_fin, cupo_max, cupo_actual FROM actividades"
+    # LEFT JOIN para obtener usuarios enrolados y datos de la actividad en una sola consulta
+    query = """
+        SELECT a.id_actividad, a.titulo, a.descripcion, a.ubicacion, a.fecha_inicio, a.fecha_fin, a.cupo_max, a.cupo_actual,
+               GROUP_CONCAT(uea.usuario_id) AS usuarios_enrolados
+        FROM actividades a
+        LEFT JOIN usuarios_en_actividades uea ON a.id_actividad = uea.actividad_id
+        GROUP BY a.id_actividad, a.titulo, a.descripcion, a.ubicacion, a.fecha_inicio, a.fecha_fin, a.cupo_max, a.cupo_actual
+    """
 
     try:
         cursor.execute(query)
         resultados = cursor.fetchall()
-        # Attach enrolled users for each activity (if the table exists)
         actividades = []
         for row in resultados:
-            try:
-                cursor.execute(
-                    "SELECT usuario_id FROM usuarios_en_actividades WHERE actividad_id = %s",
-                    (row["id_actividad"],)
-                )
-                usuarios = [r["usuario_id"] for r in cursor.fetchall()]
-            except Exception:
-                usuarios = []
-            row["usuarios_enrolados"] = usuarios
+            # Parsear usuarios_enrolados como lista de int si no es None
+            if row["usuarios_enrolados"]:
+                row["usuarios_enrolados"] = [int(uid) for uid in row["usuarios_enrolados"].split(",") if uid]
+            else:
+                row["usuarios_enrolados"] = []
             actividades.append(Actividad(**row))
         return actividades
     except Exception as e:
@@ -75,7 +79,7 @@ def obtener_actividad(actividad_id: int):
         raise HTTPException(status_code=500, detail="Error al conectar a la base de datos")
     
     cursor = cnx.cursor(dictionary=True)
-    query = "SELECT id_actividad, titulo, descripcion, fecha_inicio, fecha_fin, cupo_max, cupo_actual FROM actividades WHERE id_actividad = %s"
+    query = "SELECT id_actividad, titulo, descripcion, ubicacion, fecha_inicio, fecha_fin, cupo_max, cupo_actual FROM actividades WHERE id_actividad = %s"
     
     try:
         cursor.execute(query, (actividad_id,))
@@ -100,12 +104,6 @@ def crear_actividad(payload: dict = Body(...), id_uv: int | None = Depends(get_a
         errores = [err.get('msg') or str(err) for err in ve.errors()]
         raise HTTPException(status_code=422, detail={"mensaje": "Datos inválidos en la solicitud", "errores": errores})
 
-    # Debug: token in header
-    try:
-        print("[DEBUG] Authorization header (actividades):", authorization)
-    except Exception:
-        pass
-
     effective_id_uv = id_uv or id_uv_body
     if effective_id_uv is None:
         raise HTTPException(status_code=401, detail="No se pudo derivar id_uv del token")
@@ -126,20 +124,19 @@ def crear_actividad(payload: dict = Body(...), id_uv: int | None = Depends(get_a
         except Exception:
             has_id_uv = False
 
-        print(f"[DEBUG] crear_actividad effective_id_uv={effective_id_uv} has_id_uv={has_id_uv}")
-
         # Convertir fechas a formato MySQL
         fecha_inicio = iso_to_mysql(actividad_data.fecha_inicio)
         fecha_fin = iso_to_mysql(actividad_data.fecha_fin)
 
         if has_id_uv:
             query = """
-                INSERT INTO actividades (titulo, descripcion, fecha_inicio, fecha_fin, cupo_max, cupo_actual, id_uv)
-                VALUES (%s, %s, %s, %s, %s, %s, %s)
+                INSERT INTO actividades (titulo, descripcion, ubicacion, fecha_inicio, fecha_fin, cupo_max, cupo_actual, id_uv)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
             """
             values = (
                 actividad_data.titulo,
                 actividad_data.descripcion,
+                actividad_data.ubicacion,
                 fecha_inicio,
                 fecha_fin,
                 actividad_data.cupo_max,
@@ -148,12 +145,13 @@ def crear_actividad(payload: dict = Body(...), id_uv: int | None = Depends(get_a
             )
         else:
             query = """
-                INSERT INTO actividades (titulo, descripcion, fecha_inicio, fecha_fin, cupo_max, cupo_actual)
-                VALUES (%s, %s, %s, %s, %s, %s)
+                INSERT INTO actividades (titulo, descripcion, ubicacion, fecha_inicio, fecha_fin, cupo_max, cupo_actual)
+                VALUES (%s, %s, %s, %s, %s, %s, %s)
             """
             values = (
                 actividad_data.titulo,
                 actividad_data.descripcion,
+                actividad_data.ubicacion,
                 fecha_inicio,
                 fecha_fin,
                 actividad_data.cupo_max,
@@ -161,8 +159,23 @@ def crear_actividad(payload: dict = Body(...), id_uv: int | None = Depends(get_a
             )
 
         cursor.execute(query, values)
-        cnx.commit()
         actividad_id = cursor.lastrowid
+
+        # Enrolar automáticamente al usuario creador
+        try:
+            cursor.execute(
+                "INSERT INTO usuarios_en_actividades (usuario_id, actividad_id) VALUES (%s, %s)",
+                (actividad_data.id_usuario, actividad_id)
+            )
+            # Actualizar el cupo_actual (ya que el usuario creador está enrolado)
+            cursor.execute(
+                "UPDATE actividades SET cupo_actual = cupo_actual + 1 WHERE id_actividad = %s",
+                (actividad_id,)
+            )
+        except Exception:
+            pass  # Si ya está enrolado o hay error, continuar igual
+
+        cnx.commit()
         # devolver payload similar a frontend expectations
         resp = {"id_actividad": actividad_id, **actividad_data.model_dump(), "fecha_inicio": fecha_inicio, "fecha_fin": fecha_fin}
         return resp
@@ -170,7 +183,6 @@ def crear_actividad(payload: dict = Body(...), id_uv: int | None = Depends(get_a
         raise
     except Exception as e:
         cnx.rollback()
-        print("Error al crear actividad:", e)
         raise HTTPException(status_code=500, detail=f"Error al crear la actividad: {e}")
     finally:
         try: cursor.close()
