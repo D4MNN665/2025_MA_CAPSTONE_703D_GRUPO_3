@@ -361,15 +361,6 @@ const JuntaVecinosPage = () => {
       {/* FOOTER */}
       <footer className="footer mt-5 py-4">
         <Container>
-          <div className="footer-cta">
-            ¿Te gustaría organizar una actividad?
-            <Link
-              to="/proyectos"
-              className="btn btn-outline-primary btn-sm ms-2"
-            >
-              Proponer proyecto
-            </Link>
-          </div>
 
           <div id="contacto" className="contacto text-center">
             <h3 className="mb-3">Datos de Contacto</h3>

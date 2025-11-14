@@ -79,6 +79,8 @@ function Actividades() {
             <th>Descripción</th>
             <th>Fecha</th>
             <th>Lugar</th>
+            <th>Cupo</th>
+            <th>Cupo Máximo</th>
             <th>Acciones</th>
           </tr>
         </thead>
@@ -90,7 +92,9 @@ function Actividades() {
                 {/* <td>{a.estado}</td> */}
               <td>{a.descripcion}</td>
               <td>{a.fecha_inicio ? a.fecha_inicio : "-"}</td>
-              <td>{a.lugar || "-"}</td>
+              <td>{a.ubicacion}</td>
+              <td>{a.cupo_actual} / {a.cupo_max}</td>
+              <td>{a.cupo_max}</td>
               <td>
                   {/*
                   {a.estado === "pendiente" && (
